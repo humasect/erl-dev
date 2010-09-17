@@ -1,11 +1,11 @@
 %%% -*- erlang -*-
 
-{application, val,
+{application, van,
  [{description, "Visionire Server"},
   {vsn, "1.0"},
   {modules, [
-             van_app,
-             van_sup,
+             van_app, van_sup,
+             van_tcp_sup, van_tcp
              %%van_web_misultin,
              %%val_actor,
              %%val_map,

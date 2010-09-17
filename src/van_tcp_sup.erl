@@ -1,12 +1,12 @@
 %%%-------------------------------------------------------------------
-%%% @author Lyndon Tremblay <humasect@gmail.com>
+%%% @author Lyndon Tremblay <>
 %%% @copyright (C) 2010, Lyndon Tremblay
 %%% @doc
 %%%
 %%% @end
-%%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 17 Sep 2010 by Lyndon Tremblay <>
 %%%-------------------------------------------------------------------
--module(van_sup).
+-module(van_tcp_sup).
 -author('humasect@gmail.com').
 -behaviour(supervisor).
 
@@ -31,11 +31,8 @@ start_link() ->
 
 init([]) ->
     {ok, {{one_for_one, 1, 60},
-     [
-      {van_tcp_sup, {van_tcp_sup, start_link, []},
-       permanent, infinity, supervisor, [van_tcp_sup]}
-     ]}
-    }.
+          [{van_tcp, {van_tcp, start_link, []},
+            permanent, 60, worker, [van_tcp]}]}}.
 
 %%%===================================================================
 %%% Internal functions
