@@ -72,14 +72,18 @@ handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
 
+handle_cast({connected,Acceptor}, State) ->
+    unlink(Acceptor),
+    io:format("connected! ~n"),
+    {noreply, respawn_state(State)};
+
 handle_cast(_Msg, State) -> {noreply, State}.
 
 %%--------------------------------------------------------------------
 
-handle_info({'EXIT', _From, Reason}, {ListenSocket, _, Connections}) ->
+handle_info({'EXIT', _From, Reason}, State) ->
     io:format("acceptor exit! ~p~n", [Reason]),
-    NewAcceptor = spawn_link(?MODULE, acceptor_init, [ListenSocket]),
-    {noreply, {ListenSocket, NewAcceptor, Connections}};
+    {noreply, respawn_state(State)};
 
 handle_info(_Info, State) ->
     {noreply, State}.
@@ -90,6 +94,10 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 %%% Internal functions
 %%%===================================================================
 
+respawn_state({ListenSocket, Acceptor, Connections}) ->
+    NewAcceptor = spawn_link(?MODULE, acceptor_init, [ListenSocket]),
+    {ListenSocket, NewAcceptor, Connections}.
+
 acceptor_init(ListenSocket) ->
     io:format("accepting...~n"),
     case gen_tcp:accept(ListenSocket) of
@@ -99,5 +107,4 @@ acceptor_init(ListenSocket) ->
         Error ->
             exit({error,{bad_accept,Error}})
     end.
-
 
