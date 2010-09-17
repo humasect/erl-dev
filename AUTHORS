@@ -1,0 +1,14 @@
+# -*- org-mode -*-
+
+Here we will try to list all of those who have contributed to this server.
+
+* Ciprian Ciubotariu      <cheepeero@gmx.net>
+
+** Created VRE server.
+** Created java client for testing VRE server.
+
+* Lyndon Tremblay         <humasect@gmail.com>
+
+** Created Valhalla server.
+#** Combined VRE and VAL into VAN server.
+** Created emacs client for testing VAN server.
