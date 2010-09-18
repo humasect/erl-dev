@@ -22,6 +22,7 @@
 
 %% API
 -export([start_link/0]).
+-export([broadcast/1]).
 
 %% callbacks
 -export([init/1, terminate/2,
@@ -31,9 +32,21 @@
 %% internal
 -export([acceptor_init/1]).
 
--include("van.hrl").
--define(SERVER, ?MODULE). 
-%% -record(state, {listen_socket, acceptor, something}).
+-define(SERVER, ?MODULE).
+-define(LISTEN_OPTS, [binary, {packet,raw},
+                      {reuseaddr,true}, {active,false}]).
+
+-define(ACCEPT_OPTS, [binary, {packet,raw},
+                      %% {keepalive,true}, {nodelay,true},
+                      {active,once}]).
+
+
+%% see inet:setopts/2 for valid options
+%% if not set, the following values are used:
+%% 	      {tcp_opts, [{keepalive, true},
+%% 			  {nodelay, true},
+%% 			  {tos, 16#14}]},  % MINDELAY and RELIABILITY
+%% see man page ip(7) -> netinet/ip.h for TOS values
 
 %%%===================================================================
 %%% API
@@ -43,6 +56,9 @@ start_link() ->
     {ok,Port} = application:get_env(van, tcp_port),
     gen_server:start_link({local, ?SERVER}, ?MODULE, [Port], []).
 
+broadcast(Msg) ->
+    gen_server:cast(?SERVER, {broadcast, Msg}).
+
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
@@ -50,7 +66,7 @@ start_link() ->
 -define(spawn_acceptor, spawn_link(?MODULE, acceptor_init, [ListenSocket])).
 
 init([Port]) ->
-    case gen_tcp:listen(Port, ?TCP_OPTS) of
+    case gen_tcp:listen(Port, ?LISTEN_OPTS) of
         {ok,ListenSocket} ->
             %% log here
             io:format("got socket...~n"),
@@ -69,12 +85,21 @@ handle_call(_Call, _From, State) ->
     {reply, ok, State}.
 
 handle_cast({add_client, Pid}, {ListenSocket,Acceptor,Clients}) ->
+    erlang:monitor(process, Pid),
     unlink(Acceptor),
-    {noreply, {ListenSocket, ?spawn_acceptor, [Pid | Clients]}}.
+    {noreply, {ListenSocket, ?spawn_acceptor, [Pid | Clients]}};
+handle_cast({broadcast, Msg}, State = {_, _, Clients}) ->
+    io:format("~w clients.~n", [length(Clients)]),
+    lists:foreach(fun(C) -> C ! {send, Msg} end, Clients),
+    {noreply, State}.
 
-handle_info({'EXIT', _Pid, Reason}, {ListenSocket,_,Clients}) ->
-    io:format("acceptor died! ~p~n", [Reason]),
-    {noreply, {ListenSocket, ?spawn_acceptor, Clients}}.
+handle_info({'DOWN', _Ref, process, Pid2, Reason}, {LS,Acceptor,Clients}) ->
+    NewClients = lists:delete(Pid2, Clients),
+    io:format("client died: ~p~n", [Reason]),
+    {noreply, {LS, Acceptor, NewClients}}.
+%% handle_info({'EXIT', _Pid, Reason}, {LS,_,Clients}) ->
+%%     io:format("acceptor died! ~p~n", [Reason]),
+%%     {noreply, {LS, ?spawn_acceptor, Clients}}.
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
@@ -88,9 +113,8 @@ acceptor_init(ListenSocket) ->
         {ok,Socket} ->
             io:format("~w connected.~n", [Socket]),
             gen_server:cast(?SERVER, {add_client, self()}),
+            inet:setopts(Socket, ?ACCEPT_OPTS),
             van_client:loop({tcp, Socket, waiting_auth});
-            %% supervisor:start_child...
-            %%?MODULE:accept_loop(ListenSocket);
         Else ->
             io:format("*** accept returned ~w.", [Else]),
             exit({error, {bad_accept, Else}})

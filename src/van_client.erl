@@ -9,32 +9,34 @@
 -module(van_client).
 -author('humasect@gmail.com').
 
--export([loop/1]).
+-export([loop/1, send_object/2]).
 
--include("van.hrl").
+-define(TCP_TIMEOUT, 60000).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
 loop(State = {tcp, Socket, _Status}) ->
-    case gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT) of
-        {ok,Data} ->
-            io:format("got data: ~p~n", [Data]),
+    inet:setopts(Socket, [{active,once}]),
+    receive
+        {tcp,_,Data = <<${,_/binary>>} ->
             case process_data(Data, State) of
                 {ok,NewState} ->
                     ?MODULE:loop(NewState);
                 Else ->
                     closed(State, Else)
             end;
+        {tcp,_,Data} ->
+            closed(State, {invalid_data, Data});
         {send,Object} ->
             send_object(State, Object),
             ?MODULE:loop(State);
-        {error,Reason} ->
-            closed(State, Reason)
-    %% after
-    %%     ?TCP_TIMEOUT ->
-    %%         closed(socket, S, timeout)
+        Else ->
+            closed(State, Else)
+    after
+        ?TCP_TIMEOUT ->
+            closed(State, timeout)
     end.
 
 close_game(State) -> closed.
@@ -72,10 +74,10 @@ handle_message(Msg, State = {_SockType, _Socket, _Status}) ->
 %%%===================================================================
 
 closed(State = {web, WS, _Status}, Reason) ->
-    io:format("web socket ~w ~p.~n", [WS:get(socket), Reason]),
+    io:format("web socket: ~w ~p.~n", [WS:get(socket), Reason]),
     close_game(State);
 closed(State = {tcp, S, _Status}, Reason) ->     
-    io:format("tcp socket ~w ~p.~n", [S, Reason]),
+    io:format("tcp socket: ~w ~p.~n", [S, Reason]),
     close_game(State).
 
 send_raw({web, WS, _Status}, Data) ->
