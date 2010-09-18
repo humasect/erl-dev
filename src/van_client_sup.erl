@@ -4,9 +4,9 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 18 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(van_sup).
+-module(van_client_sup).
 -author('humasect@gmail.com').
 -behaviour(supervisor).
 
@@ -30,15 +30,10 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
-    {ok, {{one_for_one, 1, 60},
-     [
-      {van_tcp_sup, {van_tcp_sup, start_link, []},
-       permanent, infinity, supervisor, [van_tcp_sup]},
+    ClientSpec = {undefined, {van_cilent, start_link, []},
+                  temporary, 2000, worker, []},
 
-      {van_client_sup, {van_client_sup, start_link, []},
-       permanent, infinity, supervisor, [van_client_sup]}
-     ]}
-    }.
+    {ok, {{simple_one_for_one, 10, 3600}, [ClientSpec]}}.
 
 %%%===================================================================
 %%% Internal functions

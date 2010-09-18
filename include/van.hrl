@@ -14,7 +14,9 @@
 %% 			  {tos, 16#14}]},  % MINDELAY and RELIABILITY
 %% see man page ip(7) -> netinet/ip.h for TOS values
 
--define(TCP_OPTS, [%% binary, {packet,raw},
+-define(TCP_OPTS, [binary, {packet,raw},
                    %% {keepalive,true}, {nodelay,true},
                    {reuseaddr,true}, {active,false}]).
+
+-define(TCP_TIMEOUT, 60000).
 

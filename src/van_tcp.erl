@@ -16,16 +16,17 @@
 %%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
 -module(van_tcp).
+-behaviour(gen_server).
 -author('cheepeero@gmx.net').
 -author('humasect@gmail.com').
--behaviour(gen_server).
 
 %% API
 -export([start_link/0]).
 
-%% gen_server callbacks
--export([init/1, handle_call/3, handle_cast/2, handle_info/2,
-         terminate/2, code_change/3]).
+%% callbacks
+-export([init/1, terminate/2,
+         handle_call/3, handle_cast/2, handle_info/2,
+         code_change/3]).
 
 %% internal
 -export([acceptor_init/1]).
@@ -39,72 +40,58 @@
 %%%===================================================================
 
 start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+    {ok,Port} = application:get_env(van, tcp_port),
+    gen_server:start_link({local, ?SERVER}, ?MODULE, [Port], []).
 
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
 
-init([]) ->
-    %% Port = ?APP_ENV(van, port),
-    {ok,Port} = application:get_env(van, tcp_port),
-    io:format("listening...~n"),
-    case catch gen_tcp:listen(Port, ?TCP_OPTS) of
+-define(spawn_acceptor, spawn_link(?MODULE, acceptor_init, [ListenSocket])).
+
+init([Port]) ->
+    case gen_tcp:listen(Port, ?TCP_OPTS) of
         {ok,ListenSocket} ->
             %% log here
             io:format("got socket...~n"),
-            Acceptor = spawn_link(?MODULE, acceptor_init, [ListenSocket]),
-            {ok, {ListenSocket,Acceptor,[]}};
+            {ok, {ListenSocket, ?spawn_acceptor, []}};
         Error ->
-            %% log here
             exit(Error)
     end.
 
-terminate(_Reason, {ListenSocket,Acceptor,_}) ->
-    io:format("*** should close all connections here.~n"),
+terminate(_Reason, {ListenSocket, Acceptor, _Clients}) ->
+    io:format("** acceptor terminated. Should kill all clients.~n"),
     exit(Acceptor, kill),
     gen_tcp:close(ListenSocket),
     ok.
 
-%%--------------------------------------------------------------------
+handle_call(_Call, _From, State) ->
+    {reply, ok, State}.
 
-handle_call(_Request, _From, State) ->
-    Reply = ok,
-    {reply, Reply, State}.
-
-handle_cast({connected,Acceptor}, State) ->
+handle_cast({add_client, Pid}, {ListenSocket,Acceptor,Clients}) ->
     unlink(Acceptor),
-    io:format("connected! ~n"),
-    {noreply, respawn_state(State)};
+    {noreply, {ListenSocket, ?spawn_acceptor, [Pid | Clients]}}.
 
-handle_cast(_Msg, State) -> {noreply, State}.
+handle_info({'EXIT', _Pid, Reason}, {ListenSocket,_,Clients}) ->
+    io:format("acceptor died! ~p~n", [Reason]),
+    {noreply, {ListenSocket, ?spawn_acceptor, Clients}}.
 
-%%--------------------------------------------------------------------
-
-handle_info({'EXIT', _From, Reason}, State) ->
-    io:format("acceptor exit! ~p~n", [Reason]),
-    {noreply, respawn_state(State)};
-
-handle_info(_Info, State) ->
-    {noreply, State}.
-
-code_change(_OldVsn, State, _Extra) -> {ok, State}.
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
 
-respawn_state({ListenSocket, Acceptor, Connections}) ->
-    NewAcceptor = spawn_link(?MODULE, acceptor_init, [ListenSocket]),
-    {ListenSocket, NewAcceptor, Connections}.
-
 acceptor_init(ListenSocket) ->
-    io:format("accepting...~n"),
     case gen_tcp:accept(ListenSocket) of
         {ok,Socket} ->
-            gen_server:cast(?SERVER, {connected, self()}),
-            io:format("start client handler!~n");
-        Error ->
-            exit({error,{bad_accept,Error}})
+            io:format("~w connected.~n", [Socket]),
+            gen_server:cast(?SERVER, {add_client, self()}),
+            van_client:loop({tcp, Socket, waiting_auth});
+            %% supervisor:start_child...
+            %%?MODULE:accept_loop(ListenSocket);
+        Else ->
+            io:format("*** accept returned ~w.", [Else]),
+            exit({error, {bad_accept, Else}})
     end.
-

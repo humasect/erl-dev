@@ -16,7 +16,7 @@
   {mod, {van_app,[]}},   % only needed if application needs to be started
   {env, [
          {web_port, 8000},
-         {tcp_port, 8001},
+         {tcp_port, 1979},
 
          {irc_server, "velocity.ca.us.quakenet.org"},
          {irc_port, 6667},
