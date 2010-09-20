@@ -20,9 +20,14 @@
   (get-buffer-create "*lco-game*"))
 
 (defun log (msg)
-  (set-buffer (message-buffer))
-  (insert msg)
-  (set-buffer (other-buffer)))
+  (with-current-buffer (message-buffer)
+    
+  ;;(set-buffer (message-buffer))
+  ;;(buffer-end 1)
+    (set-window-point (get-buffer-window (message-buffer)) (point-max))
+    (goto-char (point-max))
+    (insert msg)))
+  ;;(set-buffer (other-buffer)))
 
 (defvar lco-process nil)
 
@@ -36,7 +41,10 @@
 
 (defun lco-filter (proc string)
   (log string)
-  (log (format "json: %s" (json-read-from-string string))))
+  (log (format "json: %s\n" (json-read-from-string string))))
+
+(defun lco-sentinel (proc what)
+  (log what))
 
 (defun init-net (user pass)
   (log "Connecting... ")
@@ -48,7 +56,8 @@
                      :family nil
                      :buffer (game-buffer)
                      :coding 'utf-8
-                     :filter 'lco-filter))
+                     :filter 'lco-filter
+                     :sentinel 'lco-sentinel))
   (if lco-process
       (log "OK.\n")
     (log "Error.\n")))
@@ -69,10 +78,14 @@
              (tool-bar-lines . nil))))
 
   (select-frame f)
-  (switch-to-buffer (game-buffer))
-  (setq w2 (split-window (selected-window) 38))
+  (switch-to-buffer (message-buffer))
+  ;;(delete-region (point-min) (point-max))
+  (setq w2 (split-window (selected-window) 10))
   (select-window w2)
-  (switch-to-buffer (message-buffer)))
+  (switch-to-buffer (game-buffer))
+  ;;(delete-region (point-min) (point-max))
+  )
+  ;;(switch-to-buffer (game-buffer)))
 
 (defun movement (angle)
   (lco-send '(:move angle)))
@@ -80,22 +93,22 @@
 (defun init-keys ()
   (set-buffer (game-buffer))
 
-  (local-set-key "4" '(lambda () (movement 270)))
-  (local-set-key "2" '(lambda () (movement 180)))
-  (local-set-key "6" '(lambda () (movement 90)))
-  (local-set-key "8" '(lambda () (movement 0)))
+  (local-set-key "4" (lambda () (interactive) (movement 270)))
+  (local-set-key "2" (lambda () (interactive) (movement 180)))
+  (local-set-key "6" (lambda () (interactive) (movement 90)))
+  (local-set-key "8" (lambda () (interactive) (movement 0)))
 
-  (local-set-key "7" '(lambda () (movement 315)))
-  (local-set-key "9" '(lambda () (movement 45)))
-  (local-set-key "3" '(lambda () (movement 135)))
-  (local-set-key "1" '(lambda () (movement 225))))
+  (local-set-key "7" (lambda () (interactive) (movement 315)))
+  (local-set-key "9" (lambda () (interactive) (movement 45)))
+  (local-set-key "3" (lambda () (interactive) (movement 135)))
+  (local-set-key "1" (lambda () (interactive) (movement 225))))
 
 ;;--------------------------------------------------------------
 ;; API
 ;;--------------------------------------------------------------
 
 (defun lco-init ()
-  (log lco-splash)
+  (log (format "\n%s" lco-splash))
   (init-keys))
 
 (defun lco (user pass)
@@ -104,7 +117,7 @@
   (lco-init)
 
   (init-net user pass)
-  (lco-send '(:login [user pass]))
+  (lco-send '((:client (:login [user pass "japanese"]))))
   )
 
 (defun lco-quit ()

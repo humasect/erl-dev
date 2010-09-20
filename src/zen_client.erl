@@ -42,27 +42,42 @@ loop(State = {tcp, Socket, _Status}) ->
             closed(State, timeout)
     end.
 
-close_game(State) -> closed.
+close_game(_State) -> closed.
 %%     val_game_sup:close_game(Id);
 
 %%%===================================================================
 %%% messaging
 %%%===================================================================
 
-unwrap_message([Msg]) -> unwrap_message(Msg);
-unwrap_message({obj,Object}) -> unwrap_message(Object);
+unwrap_message([Msg])               -> unwrap_message(Msg);
+unwrap_message({obj,Object})        -> unwrap_message(Object);
 unwrap_message({Name, {obj,Props}}) -> {Name, Props};
-unwrap_message({Name, Props}) -> {Name, Props}.
+unwrap_message({Name, Props})       -> {Name, Props};
+unwrap_message(Msg)                 -> Msg.
 
-process_data(Data, State) ->
+%%wrap_message([Msg]) -> {obj, [{result, Msg}]};
+%%wrap_message(Msg)   -> {obj, [{result, {obj, Msg}]}}.
+wrap_message(Msg)   -> {obj, [{result, {obj, Msg}}]}.
+
+send_result(State, Result) ->
+    send_object(State, [{result, {obj, [Result]}}]).
+
+process_data(Data, Client) ->
     {ok,Msg1,_Remain} = json:decode(Data),
     Msg = unwrap_message(Msg1),
     io:format("message = ~p~n", [Msg]),
-    handle_message(Msg, State).
+
+    case Msg of
+        {"client", RealMsg} ->
+            handle_message(RealMsg, Client);
+        {Module, _} ->
+            send_result(Client,
+                        {error, [unknown_module, list_to_binary(Module)]})
+    end.
     %FName = list_to_existing_atom("msg_"++Name),
     %erlang:apply(?MODULE, FName, [State|Args]).
 
-is_logged(Id) ->
+is_logged(_Id) ->
     false.
     %% case val_game_sup:which_game(Id) of
     %%     undefined -> false;
@@ -102,14 +117,13 @@ handle_message({"login", [Username, Password, Language]}, State) ->
             end},
 
     case ?MODULE:authorize(Auth) of
-        {ok,Id} ->
+        {ok,_Id} ->
             io:format("log in: ~p~n", [Auth]),
-            {ok, State}
-                ;
+            {ok, State};
         Else ->
             Lang = binary_to_existing_atom(Language,latin1),
             Text = zen_data:get_text(Lang, Else),
-            send_object(State, {"error", list_to_binary(Text)}),
+            send_result(State, {error, list_to_binary(Text)}),
             {error, Else, Auth}
     end
     ;
@@ -141,10 +155,12 @@ send_raw({web, WS, _Status}, Data) ->
 send_raw({tcp, S, _Status}, Data) ->
     gen_tcp:send(S, Data).
 
-send_object(Client, Object) when is_list(Object) ->
-    send_raw(Client, json:encode({obj, Object}));
 send_object(Client, Object) ->
-    send_raw(Client, json:encode({obj, [Object]})).
+    Send = case is_list(Object) of
+               true -> Object;
+               false -> [Object]
+           end,
+    send_raw(Client, [json:encode({obj, Send}), $\n]).
 
 -ifdef(aijosdfioje).
 ip_address(websocket, WS) ->
