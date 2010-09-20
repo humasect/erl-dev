@@ -15,8 +15,8 @@
 
 -type(language() :: english | japanese).
 
--define(DEV_ID, 100000).
--define(USER_ID, 200000).
+%%-define(DEV_ID, 100000).
+%%-define(USER_ID, 200000).
 
 -record(login,
         {

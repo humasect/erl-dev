@@ -33,6 +33,7 @@
 
 (defun lco-send (obj)
   (setq str (json-encode obj))
+  ;;(log (format "send %s" str))
   (process-send-string lco-process str))
 
 ;;--------------------------------------------------------------
@@ -117,8 +118,10 @@
   (lco-init)
 
   (init-net user pass)
-  (lco-send '((:client (:login [user pass "japanese"]))))
+  (lco-send `(:client (:login [,user ,pass "japanese"])))
   )
 
 (defun lco-quit ()
   (delete-process lco-process))
+
+

@@ -3,7 +3,7 @@
 %% @author Tony Garnock-Jones <tonygarnockjones@gmail.com>
 %% @author LShift Ltd. <query@lshift.net>
 %% @copyright 2007-2010 Tony Garnock-Jones and 2007-2010 LShift Ltd.
-%% @license
+%% license
 %%
 %% Permission is hereby granted, free of charge, to any person
 %% obtaining a copy of this software and associated documentation

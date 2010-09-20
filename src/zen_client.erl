@@ -69,7 +69,7 @@ process_data(Data, Client) ->
 
     case Msg of
         {"client", RealMsg} ->
-            handle_message(RealMsg, Client);
+            handle_message(unwrap_message(RealMsg), Client);
         {Module, _} ->
             send_result(Client,
                         {error, [unknown_module, list_to_binary(Module)]})
@@ -107,14 +107,15 @@ authorize({Name, Password, Ip}) ->
     end.
 
 handle_message({"login", [Username, Password, Language]}, State) ->
-    Auth = {binary_to_list(Username),
-            binary_to_list(Password),
-            fun ({web, WS, _}) ->
+    Ip = fun ({web, WS, _}) ->
                  WS:get(peer_addr);
              ({tcp, S, _}) ->
                  {Address,_Port} = inet:peername(S),
                  Address
-            end},
+         end,
+    Auth = {binary_to_list(Username),
+            binary_to_list(Password),
+            Ip(State)},
 
     case ?MODULE:authorize(Auth) of
         {ok,_Id} ->

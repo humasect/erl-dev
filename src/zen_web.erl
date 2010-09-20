@@ -9,15 +9,47 @@
 -module(zen_web).
 -author('humasect@gmail.com').
 
--export([start/0, restart/0, stop/0, config/1]).
+%% API
+-export([start/0, restart/0, stop/0]).
+-export([add_user/3]).
+
+-include("zen.hrl").
 
 -define(AUTH_PASS, "valhalla").
+
+-define(webconf(X), ?MODULE:config(X)).
+-export([config/1]).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
--define(webconf(X), ?MODULE:config(X)).
+start() -> 
+    inets:start(httpd, ?webconf(inets)).
+
+restart() ->
+    httpd:reload_config(?webconf(inets), non_disturbing).
+
+stop() ->
+    Pid = proplists:get_value(httpd, inets:services()),
+    inets:stop(httpd, Pid).
+
+add_user(Name, Password, Group) ->
+    Config = zen_web:config({pid_at,"game"}),
+    {ok,Users} = mod_auth:list_users(Config),
+    case lists:member(Name, Users) of
+        true  -> {error,{user_exists,Name}};
+        false ->
+            true = mod_auth:add_user(Name,[{password, Password},
+                                           {userData, #login{}}
+                                           | Config]),
+            true = mod_auth:add_group_member(Group, Name, Config)
+            %%mnesia:transaction(fun() -> make_user_t(Name, Password) end)
+    end.
+
+%%%===================================================================
+%%% Internal functions　内部の関数
+%%%===================================================================
 
 config({auth_dir,Name}) ->
     {Realm,Groups} =
@@ -81,13 +113,3 @@ config({pid_at,DirName}) ->
      {port, ?webconf(port)},
      {authPassword,?AUTH_PASS}
     ].
-
-start() -> 
-    inets:start(httpd, ?webconf(inets)).
-
-restart() ->
-    httpd:reload_config(?webconf(inets), non_disturbing).
-
-stop() ->
-    Pid = proplists:get_value(httpd, inets:services()),
-    inets:stop(httpd, Pid).

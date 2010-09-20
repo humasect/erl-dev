@@ -1,7 +1,7 @@
 %%%-------------------------------------------------------------------
 %%% @author Lyndon Tremblay <humasect@gmail.com>
-%%% @copyright (C) 2006, Ciprian Ciubotariu
 %%% @copyright (C) 2010, Lyndon Tremblay
+%%%            (C) 2006, Ciprian Ciubotariu
 %%% @doc
 %%%
 %%% The network server accepts connections on the port specified by
