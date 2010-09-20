@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(van_app).
+-module(zen_app).
 -author('humasect@gmail.com').
 -behaviour(application).
 
@@ -18,9 +18,10 @@
 %%%===================================================================
 
 start(_StartType, _StartArgs) ->
-    %% @todo init db and/or start logger.
+    %% @todo start logger.
+    zen:init_db(),
 
-    case van_sup:start_link() of
+    case zen_sup:start_link() of
         {ok, Pid} ->
             {ok, Pid};
         Error ->

@@ -5,17 +5,16 @@
 %%% @doc
 %%%
 %%% The network server accepts connections on the port specified by
-%%% the application's <code>server_port</code> setting. When a
-%%% connection is made the netserver starts a client handler by calling
-%%% the @link{clienthandler:start/1} function and resumes accepting
-%%% connections.
-%%% See the documentation of module @link{clienthandler} for details
+%%% the application's <code>tcp_port</code> setting. When a
+%%% connection is made, starts a client handler (game) and resumes
+%%% accepting connections.
+%%% See the documentation of module @link{} for details
 %%% on how the connection is handled.
 %%%
 %%% @end
 %%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(van_tcp).
+-module(zen_tcp).
 -behaviour(gen_server).
 -author('cheepeero@gmx.net').
 -author('humasect@gmail.com').
@@ -53,7 +52,7 @@
 %%%===================================================================
 
 start_link() ->
-    {ok,Port} = application:get_env(van, tcp_port),
+    {ok,Port} = application:get_env(zen, tcp_port),
     gen_server:start_link({local, ?SERVER}, ?MODULE, [Port], []).
 
 broadcast(Msg) ->
@@ -87,7 +86,8 @@ handle_call(_Call, _From, State) ->
 handle_cast({add_client, Pid}, {ListenSocket,Acceptor,Clients}) ->
     erlang:monitor(process, Pid),
     unlink(Acceptor),
-    {noreply, {ListenSocket, ?spawn_acceptor, [Pid | Clients]}};
+    {noreply, {ListenSocket, ?spawn_acceptor, [Pid | Clients]}}
+        ;
 handle_cast({broadcast, Msg}, State = {_, _, Clients}) ->
     io:format("~w clients.~n", [length(Clients)]),
     lists:foreach(fun(C) -> C ! {send, Msg} end, Clients),
@@ -114,7 +114,7 @@ acceptor_init(ListenSocket) ->
             io:format("~w connected.~n", [Socket]),
             gen_server:cast(?SERVER, {add_client, self()}),
             inet:setopts(Socket, ?ACCEPT_OPTS),
-            van_client:loop({tcp, Socket, waiting_auth});
+            zen_client:loop({tcp, Socket, waiting_auth});
         Else ->
             io:format("*** accept returned ~w.", [Else]),
             exit({error, {bad_accept, Else}})

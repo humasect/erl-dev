@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="100%" height="100%" version="1.1"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <desc>Game</desc>
+
+  <rect width="100%" height="100%"
+        fill="#00ff00" stroke="#000000"
+        style="stroke-dasharray: 6, 4;" stroke-width="4"/>
+  
+  <svg width="50%" height="50%" x="25%">
+    <rect width="100%" height="100%"
+          fill="#00ffff" stroke="#000000"
+          style="stroke-dasharray: 6, 4;" stroke-width="4"/>
+  </svg>
+
+  <!-- <use xlink:href="tiles.svg#tile" x="0" y="0"/> -->
+
+</svg>

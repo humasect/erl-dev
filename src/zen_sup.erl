@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(van_sup).
+-module(zen_sup).
 -author('humasect@gmail.com').
 -behaviour(supervisor).
 
@@ -32,11 +32,16 @@ start_link() ->
 init([]) ->
     {ok, {{one_for_one, 1, 60},
      [
-      {van_tcp_sup, {van_tcp_sup, start_link, []},
-       permanent, infinity, supervisor, [van_tcp_sup]},
+      %% zen_logger
 
-      {van_client_sup, {van_client_sup, start_link, []},
-       permanent, infinity, supervisor, [van_client_sup]}
+      {zen_tcp, {zen_tcp, start_link, []},
+       permanent, 2000, worker, [zen_tcp]},
+
+      {zen_data, {zen_data, start_link, []},
+       permanent, 2000, worker, [zen_data]},
+
+      {zen_irc_sup, {zen_irc_sup, start_link, []},
+       permanent, infinity, supervisor, [zen_irc_sup]}
      ]}
     }.
 

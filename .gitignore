@@ -1,2 +1,5 @@
 *.beam
 user_default.erl
+log/*
+priv/log/*
+.DS_Store

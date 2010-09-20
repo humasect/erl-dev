@@ -4,11 +4,11 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 18 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 19 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(van_client_sup).
--author('humasect@gmail.com').
+-module(zen_irc_sup).
 -behaviour(supervisor).
+-author('humasect@gmail.com').
 
 %% API
 -export([start_link/0]).
@@ -30,10 +30,15 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
-    ClientSpec = {undefined, {van_cilent, start_link, []},
-                  temporary, 2000, worker, []},
+    SupFlags = {one_for_one, 1, 3600},
 
-    {ok, {{simple_one_for_one, 10, 3600}, [ClientSpec]}}.
+%%    Connector = {zirc_conman, {zirc_conman, start_link, []},
+%%                 permanent, 2000, worker, [zirc_conman]},
+
+%%    ChanSup = {zen_ircchan_sup, {zirc_chan_sup, start_link, []},
+%%               permanent, infinity, supervisor, [zirc_chan_sup]},
+
+    {ok, {SupFlags, []}}.
 
 %%%===================================================================
 %%% Internal functions

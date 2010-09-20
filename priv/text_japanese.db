@@ -1,0 +1,7 @@
+% -*- erlang -*-
+
+
+{no_such_user, "ユーザがありません。"}.
+{wrong_password, "パスワードが間違います。"}.
+
+{person_01, "おはよう。"}.

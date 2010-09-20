@@ -6,12 +6,15 @@
 %%% @end
 %%% Created : 18 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(van_client).
+-module(zen_client).
 -author('humasect@gmail.com').
 
 -export([loop/1, send_object/2]).
 
 -define(TCP_TIMEOUT, 60000).
+-export([authorize/1]).
+
+-include("zen.hrl").
 
 %%%===================================================================
 %%% API
@@ -59,10 +62,61 @@ process_data(Data, State) ->
     %FName = list_to_existing_atom("msg_"++Name),
     %erlang:apply(?MODULE, FName, [State|Args]).
 
+is_logged(Id) ->
+    false.
+    %% case val_game_sup:which_game(Id) of
+    %%     undefined -> false;
+    %%     _ -> true
+    %% end.
+
+authorize({Name, Password, Ip}) ->
+    F = fun() ->
+                case mnesia:match_object(#login{name=Name, _='_'}) of
+                    [] -> no_such_user;
+                    [#login{id=Id, password=Password} = Login] ->
+                        Update = Login#login{last_time=erlang:localtime(),
+                                             last_ip=Ip},
+                        mnesia:write(Update),
+
+                        case is_logged(Id) of
+                            true -> already_logged;
+                            false -> {ok, Id}
+                        end;
+                    _ -> wrong_password
+                end
+        end,
+
+    case mnesia:transaction(F) of
+        {atomic,Result} -> Result;
+        {aborted,Reason} -> {error, Reason}
+    end.
+
+handle_message({"login", [Username, Password, Language]}, State) ->
+    Auth = {binary_to_list(Username),
+            binary_to_list(Password),
+            fun ({web, WS, _}) ->
+                 WS:get(peer_addr);
+             ({tcp, S, _}) ->
+                 {Address,_Port} = inet:peername(S),
+                 Address
+            end},
+
+    case ?MODULE:authorize(Auth) of
+        {ok,Id} ->
+            io:format("log in: ~p~n", [Auth]),
+            {ok, State}
+                ;
+        Else ->
+            Lang = binary_to_existing_atom(Language,latin1),
+            Text = zen_data:get_text(Lang, Else),
+            send_object(State, {"error", list_to_binary(Text)}),
+            {error, Else, Auth}
+    end
+    ;
 handle_message({"command", <<$/,Cmd/binary>>}, State) ->
     io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
-    {ok, State};
-
+    {ok, State}
+        ;
 handle_message(Msg, State = {_SockType, _Socket, _Status}) ->
     %%Game = val_game_sup:which_game(Id),
     %%gen_server:call(game, Msg),
@@ -75,13 +129,15 @@ handle_message(Msg, State = {_SockType, _Socket, _Status}) ->
 
 closed(State = {web, WS, _Status}, Reason) ->
     io:format("web socket: ~w ~p.~n", [WS:get(socket), Reason]),
-    close_game(State);
+    close_game(State)
+        ;
 closed(State = {tcp, S, _Status}, Reason) ->     
     io:format("tcp socket: ~w ~p.~n", [S, Reason]),
     close_game(State).
 
 send_raw({web, WS, _Status}, Data) ->
-    WS:send(Data);
+    WS:send(Data)
+        ;
 send_raw({tcp, S, _Status}, Data) ->
     gen_tcp:send(S, Data).
 

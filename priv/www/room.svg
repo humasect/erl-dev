@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="512" height="512"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <title>Gamelikeのテスト部屋</title>
+
+  <defs>
+    <rect id="tile" width="64" height="64"
+          fill="rgb(0,0,255)" stroke="rgb(0,255,0)"
+          stroke-width="3"
+          onclick="console.log(evt)"/>
+  </defs>
+
+  <!-- 上のかべ -->
+  <use xlink:href="#tile" x="0" y="0"/>
+  <use xlink:href="#tile" x="64" y="0"/>
+  <use xlink:href="#tile" x="128" y="0"/>
+  <use xlink:href="#tile" x="192" y="0"/>
+  <use xlink:href="#tile" x="256" y="0"/>
+  <use xlink:href="#tile" x="320" y="0"/>
+  <use xlink:href="#tile" x="384" y="0"/>
+  <use xlink:href="#tile" x="448" y="0"/>
+
+  <!-- 左のかべ -->
+
+</svg>
+
+
+<!--
+
+        <animateTransform
+            attributeName="transform"
+            begin="0s"
+            dur="20s"
+            type="rotate"
+            from="0 60 60"
+            to="360 60 60"
+            repeatCount="indefinite" 
+        />
+-->

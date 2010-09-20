@@ -30,26 +30,32 @@
   (setq str (json-encode obj))
   (process-send-string lco-process str))
 
+;;--------------------------------------------------------------
+;; network
+;;--------------------------------------------------------------
+
 (defun lco-filter (proc string)
-  (log string))
+  (log string)
+  (log (format "json: %s" (json-read-from-string string))))
 
 (defun init-net (user pass)
-;;make-network...
-;;set-process-buffer process buffer
   (log "Connecting... ")
-
   (setq lco-process (make-network-process
                      :name "lco-client"
                      :type nil
                      :host lco-server
                      :service lco-port
                      :family nil
-                     :buffer (message-buffer)
+                     :buffer (game-buffer)
                      :coding 'utf-8
                      :filter 'lco-filter))
   (if lco-process
       (log "OK.\n")
     (log "Error.\n")))
+
+;;--------------------------------------------------------------
+;; display / interface
+;;--------------------------------------------------------------
 
 (defun init-display ()
   (setq f (make-frame
@@ -68,12 +74,25 @@
   (select-window w2)
   (switch-to-buffer (message-buffer)))
 
+(defun movement (angle)
+  (lco-send '(:move angle)))
+
 (defun init-keys ()
   (set-buffer (game-buffer))
-  (local-set-key "x" '(lambda ()
-                       (log "diddsdsds x.\n"))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (local-set-key "4" '(lambda () (movement 270)))
+  (local-set-key "2" '(lambda () (movement 180)))
+  (local-set-key "6" '(lambda () (movement 90)))
+  (local-set-key "8" '(lambda () (movement 0)))
+
+  (local-set-key "7" '(lambda () (movement 315)))
+  (local-set-key "9" '(lambda () (movement 45)))
+  (local-set-key "3" '(lambda () (movement 135)))
+  (local-set-key "1" '(lambda () (movement 225))))
+
+;;--------------------------------------------------------------
+;; API
+;;--------------------------------------------------------------
 
 (defun lco-init ()
   (log lco-splash)
