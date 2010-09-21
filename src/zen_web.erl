@@ -11,7 +11,7 @@
 
 %% API
 -export([start/0, restart/0, stop/0]).
--export([add_user/4, delete_user/1]).
+-export([add_user/4, delete_user/1, user_group/1]).
 
 -include("zen.hrl").
 -include("mod_auth.hrl").
@@ -53,33 +53,29 @@ delete_user(Login) ->
     case mod_auth:get_user(Login, Config) of
         {ok,_User} ->
             true = mod_auth:delete_user(Login, Config),
-            lists:map(
-              fun(G) ->
-                      true = mod_auth:delete_group_member(G, Login, Config)
-              end, list_user_groups(Login));
+            true = mod_auth:delete_group_member(user_group(Login),
+                                                Login, Config);
+            %% lists:map(
+            %%   fun(G) ->
+            %%           true = mod_auth:delete_group_member(G, Login, Config)
+            %%   end, list_user_groups(Login));
         Error -> Error
     end.
 
-list_user_groups(Login) ->
-    Groups = mod_auth:list_groups(?webpidconf),
-    error.
-
--ifdef(hhihihihi).
-authorize({Name, Password, _Ip}) ->
-    %%IsLogged = fun(_Id) ->
-    %% case val_game_sup:which_game(Id) of
-    %%     undefined -> false;
-    %%     _ -> true
-    %% end.                       
-    %%                   false
-    %%           end,
-    case mod_auth:get_user(Name, ?webpidconf) of
-        {ok, User = #httpd_user{user_data = Id}}
-          when User#httpd_user.password =:= Password ->
-            {ok,Id};
-        Error -> Error
-    end.
--endif.
+user_group(Login) ->
+    Config = ?webpidconf,
+    {ok,Groups} = mod_auth:list_groups(Config),
+    LS = lists:map(
+           fun(G) ->
+                   {ok,Users} = mod_auth:list_group_members(G, Config),
+                   {G,Users}
+           end, Groups),
+    [{G,_}] = lists:filter(
+                fun({G,Users}) ->
+                        lists:member(Login,Users)
+                end, LS),
+    %% there should only be one.
+    G.
 
 %%%===================================================================
 %%% Internal functions　内部の関数

@@ -116,10 +116,13 @@
   (lco-init)
 
   (init-net user pass)
-  (lco-send `(:client (:login [,user ,pass "japanese"])))
+  (lco-send `(:client (:login [,user ,pass])))
   )
 
 (defun lco-quit ()
+  (interactive)
   (delete-process lco-process))
 
-
+(defun lco-say (msg)
+  (interactive "sMessage: ")
+  (lco-send `(:client (:say msg))))

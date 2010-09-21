@@ -42,8 +42,12 @@ loop(State = {tcp, Socket, _Status}) ->
             closed(State, timeout)
     end.
 
-close_game(_State) -> closed.
-%%     val_game_sup:close_game(Id);
+close_game({SockType, Socket, {in_game, Id, _Game}}) ->
+    %%val_game_sup:close_game(Id);
+    {SockType, Socket, closed}
+        ;
+close_game({SockType, Socket, _}) ->
+    {SockType, Socket, closed}.
 
 %%%===================================================================
 %%% messaging
@@ -85,13 +89,15 @@ authorize({Login, Password, Ip}) ->
                 case mnesia:match_object(#account{login=Login,
                                                   password=Password,
                                                   _='_'}) of
-                    [#account{id=Id} = Account] ->
+                    [#account{id=Id,name=Name} = Account] ->
                         Update = Account#account{last_time=erlang:localtime(),
                                                  last_ip=Ip},
                         mnesia:write(Update),
                         case IsLogged(Ip) of
                             true -> id_in_use;
-                            false -> {ok, Id}
+                            false ->
+                                Group = zen_web:user_group(Login),
+                                {ok, Group, Id, Name}
                         end;
                     _ -> bad_credentials
                 end
@@ -101,50 +107,26 @@ authorize({Login, Password, Ip}) ->
         {aborted,Reason} -> {error,Reason}
     end.
 
--ifdef(euaeuaoeuaoeu).
-authorize({Name, Password, Ip}) ->
-    F = fun() ->
-                case mnesia:match_object(#login{name=Name, _='_'}) of
-                    [] -> no_such_user;
-                    [#login{id=Id, password=Password} = Login] ->
-                        Update = Login#login{last_time=erlang:localtime(),
-                                             last_ip=Ip},
-                        mnesia:write(Update),
-
-                        case IsLogged(Id) of
-                            true -> already_logged;
-                            false -> {ok, Id}
-                        end;
-                    _ -> wrong_password
-                end
-        end,
-
-    case mnesia:transaction(F) of
-        {atomic,Result} -> Result;
-        {aborted,Reason} -> {error, Reason}
-    end.
--endif().
-
-handle_message({"login", [Login, Password]}, State) ->
-    handle_message({"login", [Login, Password, english]}, State)
-        ;
-handle_message({"login", [Login, Password, Language]}, State) ->
-    Ip = fun ({web, WS, _}) ->
+handle_message({"login", [Login, Password]},
+               State = {SockType, Socket, waiting_auth}) ->
+    Ip = fun (web, WS) ->
                  WS:get(peer_addr);
-             ({tcp, S, _}) ->
+             (tcp, S) ->
                  {Address,_Port} = inet:peername(S),
                  Address
          end,
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
-            Ip(State)},
+            Ip(SockType, Socket)},
 
     case ?MODULE:authorize(Auth) of
-        {ok,_Id} ->
+        {ok,Group,Id,Name} ->
             io:format("log in: ~p~n", [Auth]),
-            {ok, State};
+            send_result(State, {ok, [Group, Id, list_to_binary(Name)]}),
+            {ok, {SockType, Socket, {in_game, Id, undefined}}};
         Else ->
-            Lang = binary_to_existing_atom(Language,latin1),
+            %%Lang = binary_to_existing_atom(Language,latin1),
+            Lang = english,
             Text = zen_data:get_text(Lang, Else),
             send_result(State, {error, list_to_binary(Text)}),
             {error, Else, Auth}
@@ -154,11 +136,19 @@ handle_message({"command", <<$/,Cmd/binary>>}, State) ->
     io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
     {ok, State}
         ;
-handle_message(Msg, State = {_SockType, _Socket, _Status}) ->
+handle_message({"say", Text},
+               State = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
+    zen_tcp:broadcast({person_said, Text}),
+    {ok, State}
+    ;
+handle_message(Msg, State = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
     %%Game = val_game_sup:which_game(Id),
     %%gen_server:call(game, Msg),
     io:format("game message: ~p~n", [Msg]),
-    {ok, State}.
+    {ok, State}
+        ;
+handle_message(Msg, State) ->
+    closed(State, {error, unhandled_message, Msg}).
 
 %%%===================================================================
 %%% socket
