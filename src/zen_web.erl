@@ -85,8 +85,8 @@ config({auth_dir,Name}) ->
     {Realm,Groups} =
         case Name of
             "game" -> {"Gamelike", [dev, admin, player]};
-            "edoc" -> {"Zen Edoc", [dev, admin]};
-            "org" -> {"Zen Org", [dev, admin]};
+            "edoc" -> {"Zen Edoc", [dev, admin, vendor]};
+            "org" -> {"Zen Org", [dev, admin, vendor]};
             "stats" -> {"Gamelike Stats", [dev, admin, vendor]};
             _ -> {"Valhalla", [dev]}
         end,

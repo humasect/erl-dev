@@ -2,6 +2,11 @@
 
 #+OPTIONS: ^:{}
 
+** TODO zen_tcp:broadcaost to everyone, but zen_tcp:status_broadcast to status.
+** TODO print IP address
+** TODO logging!
+** TODO ping/pong timeout
+
 * Emacs
 
 ** TODO iswitchでタブコンプリート!

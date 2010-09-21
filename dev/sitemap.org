@@ -8,5 +8,6 @@
    + [[file:vrenvironment.org][/VREnvironment Server/]]
    + [[file:valhalla.org][/Valhalla Game Server/]]
    + [[file:webclient.org][/Web Client/]]
+   + [[file:quickstart.org][/Zen Server Quick Start/]]
    + [[file:emacs.org][emacs]]
    + [[file:notes.org][notes]]

@@ -125,4 +125,4 @@
 
 (defun lco-say (msg)
   (interactive "sMessage: ")
-  (lco-send `(:client (:say msg))))
+  (lco-send `(:client (:say ,msg))))
