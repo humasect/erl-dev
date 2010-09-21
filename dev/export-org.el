@@ -20,6 +20,7 @@
             :publishing-directory ,zen-www-root
             :auto-sitemap t
             :sitemap-title "/Site Map/"
+            :sitemal-alphabetically nil
             :recursive t
             :headline-levels 4
             :auto-preamble t)
