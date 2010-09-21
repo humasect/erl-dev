@@ -12,7 +12,7 @@
 -export([loop/1, send_object/2]).
 
 -define(TCP_TIMEOUT, 60000).
--export([authorize/1]).
+%%-export([authorize/1]).
 
 -include("zen.hrl").
 
@@ -77,14 +77,14 @@ process_data(Data, Client) ->
     %FName = list_to_existing_atom("msg_"++Name),
     %erlang:apply(?MODULE, FName, [State|Args]).
 
-is_logged(_Id) ->
-    false.
+-ifdef(euaeuaoeuaoeu).
+authorize({Name, Password, Ip}) ->
+    IsLogged = fun(_Id) ->
     %% case val_game_sup:which_game(Id) of
     %%     undefined -> false;
     %%     _ -> true
-    %% end.
-
-authorize({Name, Password, Ip}) ->
+    %% end.                       
+                       
     F = fun() ->
                 case mnesia:match_object(#login{name=Name, _='_'}) of
                     [] -> no_such_user;
@@ -93,7 +93,7 @@ authorize({Name, Password, Ip}) ->
                                              last_ip=Ip},
                         mnesia:write(Update),
 
-                        case is_logged(Id) of
+                        case IsLogged(Id) of
                             true -> already_logged;
                             false -> {ok, Id}
                         end;
@@ -105,6 +105,7 @@ authorize({Name, Password, Ip}) ->
         {atomic,Result} -> Result;
         {aborted,Reason} -> {error, Reason}
     end.
+-endif().
 
 handle_message({"login", [Username, Password, Language]}, State) ->
     Ip = fun ({web, WS, _}) ->
@@ -117,7 +118,7 @@ handle_message({"login", [Username, Password, Language]}, State) ->
             binary_to_list(Password),
             Ip(State)},
 
-    case ?MODULE:authorize(Auth) of
+    case {ok,0} of %%?MODULE:authorize(Auth) of
         {ok,_Id} ->
             io:format("log in: ~p~n", [Auth]),
             {ok, State};

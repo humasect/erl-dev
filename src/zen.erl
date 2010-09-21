@@ -54,8 +54,8 @@ init_db() ->
 
     %% ウーザを追加
     %% make sure we have some users.
-    ?MODULE:add_user("dev", "dev", dev),
-    ?MODULE:add_user("humasect", "sect0huma", user),
+    zen_web:add_user("dev", "dev", dev),
+    zen_web:add_user("humasect", "sect0huma", user),
     ok.
 
 -ifdef(asdfasd).

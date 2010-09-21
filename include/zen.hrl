@@ -20,9 +20,9 @@
 
 -record(login,
         {
-          id :: uinteger(),
+          %%id :: uinteger(),
           name :: string(),
-          password :: string(),
+          %%password :: string(),
           actor_id :: uinteger(),
           language=english :: language(),
           create_time=erlang:localtime(),

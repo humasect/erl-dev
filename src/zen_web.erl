@@ -54,8 +54,8 @@ add_user(Name, Password, Group) ->
 config({auth_dir,Name}) ->
     {Realm,Groups} =
         case Name of
-            "game" -> {"Gamelike", ["dev", "gm", "player"]};
-            "stats" -> {"Gamelike Stats", ["dev", "gm", "vendor"]};
+            "game" -> {"Gamelike", [dev, admin, player]};
+            "stats" -> {"Gamelike Stats", [dev, admin, vendor]};
             _ -> {"Valhalla", ["dev"]}
         end,
 
