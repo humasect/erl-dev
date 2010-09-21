@@ -11,13 +11,15 @@
 
 %% API
 -export([start/0, restart/0, stop/0]).
--export([add_user/3]).
+-export([add_user/4, delete_user/1]).
 
 -include("zen.hrl").
+-include("mod_auth.hrl").
 
 -define(AUTH_PASS, "valhalla").
 
 -define(webconf(X), ?MODULE:config(X)).
+-define(webpidconf, ?webconf({pid_at, "game"})).
 -export([config/1]).
 
 %%%===================================================================
@@ -34,18 +36,51 @@ stop() ->
     Pid = proplists:get_value(httpd, inets:services()),
     inets:stop(httpd, Pid).
 
-add_user(Name, Password, Group) ->
-    Config = zen_web:config({pid_at,"game"}),
-    {ok,Users} = mod_auth:list_users(Config),
-    case lists:member(Name, Users) of
-        true  -> {error,{user_exists,Name}};
-        false ->
-            true = mod_auth:add_user(Name,[{password, Password},
-                                           {userData, #login{}}
-                                           | Config]),
-            true = mod_auth:add_group_member(Group, Name, Config)
-            %%mnesia:transaction(fun() -> make_user_t(Name, Password) end)
+add_user(Id, Login, Password, Group) ->
+    Config = ?webpidconf,
+    case mod_auth:get_user(Id, Config) of
+        {ok,_User} -> {error,user_exists};
+        _Else ->
+            true = mod_auth:add_user(Login, [{password, Password},
+                                             {userData, Id}
+                                             | Config]),
+            true = mod_auth:add_group_member(Group, Login, Config),
+            ok
     end.
+
+delete_user(Login) ->
+    Config = ?webpidconf,
+    case mod_auth:get_user(Login, Config) of
+        {ok,_User} ->
+            true = mod_auth:delete_user(Login, Config),
+            lists:map(
+              fun(G) ->
+                      true = mod_auth:delete_group_member(G, Login, Config)
+              end, list_user_groups(Login));
+        Error -> Error
+    end.
+
+list_user_groups(Login) ->
+    Groups = mod_auth:list_groups(?webpidconf),
+    error.
+
+-ifdef(hhihihihi).
+authorize({Name, Password, _Ip}) ->
+    %%IsLogged = fun(_Id) ->
+    %% case val_game_sup:which_game(Id) of
+    %%     undefined -> false;
+    %%     _ -> true
+    %% end.                       
+    %%                   false
+    %%           end,
+
+    case mod_auth:get_user(Name, ?webpidconf) of
+        {ok, User = #httpd_user{user_data = Id}}
+          when User#httpd_user.password =:= Password ->
+            {ok,Id};
+        Error -> Error
+    end.
+-endif.
 
 %%%===================================================================
 %%% Internal functions　内部の関数
@@ -56,7 +91,7 @@ config({auth_dir,Name}) ->
         case Name of
             "game" -> {"Gamelike", [dev, admin, player]};
             "stats" -> {"Gamelike Stats", [dev, admin, vendor]};
-            _ -> {"Valhalla", ["dev"]}
+            _ -> {"Valhalla", [dev]}
         end,
 
     {?webconf(root) ++ "/" ++ Name ++ "/",

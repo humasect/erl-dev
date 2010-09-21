@@ -1,10 +1,13 @@
 % -*- erlang -*-
 
+{no_text, "<no text>"}.
 
 {no_such_user, "No such user."}.
 {wrong_password, "Wrong password."}.
 {already_logged, "Already logged."}.
 {unknown_error, "Unknown error."}.
+{id_in_use, "ID in use."}.
+{bad_credentials, "Bad credentials"}.
 
 {entered_world, "~s entered game."}.
 {damage, "~s accepts ~p damage."}.

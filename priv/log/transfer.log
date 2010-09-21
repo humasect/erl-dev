@@ -33,3 +33,15 @@
 0:0:0:0:0:FFFF:7F00:1 - - [20/Sep/2010:18:41:33 -0600] "GET /favicon.ico HTTP/1.1" 200 4286
 0:0:0:0:0:FFFF:7F00:1 - - [20/Sep/2010:18:44:11 -0600] "GET /game/ HTTP/1.1" 200 371
 0:0:0:0:0:FFFF:7F00:1 - dev [20/Sep/2010:18:44:16 -0600] "GET /game/ HTTP/1.1" 200 55
+0:0:0:0:0:FFFF:55BE:3 - - [20/Sep/2010:19:32:37 -0600] "POST http://vlad-tepes.bofh.it/proxy.txt HTTP/1.0" 200 0
+0:0:0:0:0:FFFF:55BE:3 - - [20/Sep/2010:19:32:37 -0600] "GET http://vlad-tepes.bofh.it/proxy.txt HTTP/1.0" 404 0
+0:0:0:0:0:FFFF:55BE:3 - - [20/Sep/2010:19:32:37 -0600] "GET http://vlad-tepes.bofh.it/proxy.txt HTTP/1.0" 404 0
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET / HTTP/1.1" 200 2240
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /main.js HTTP/1.1" 200 1833
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /dom.js HTTP/1.1" 200 1049
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /style.css HTTP/1.1" 200 2492
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /text.js HTTP/1.1" 200 1888
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /client.js HTTP/1.1" 200 3198
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /cache.manifest HTTP/1.1" 200 114
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /game.js HTTP/1.1" 200 225
+0:0:0:0:0:FFFF:C0A8:101 - - [21/Sep/2010:00:21:59 -0600] "GET /favicon.ico HTTP/1.1" 200 4286

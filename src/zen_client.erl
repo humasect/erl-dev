@@ -12,7 +12,7 @@
 -export([loop/1, send_object/2]).
 
 -define(TCP_TIMEOUT, 60000).
-%%-export([authorize/1]).
+-export([authorize/1]).
 
 -include("zen.hrl").
 
@@ -77,14 +77,36 @@ process_data(Data, Client) ->
     %FName = list_to_existing_atom("msg_"++Name),
     %erlang:apply(?MODULE, FName, [State|Args]).
 
+authorize({Login, Password, Ip}) ->
+    IsLogged = fun(_Id) ->
+%%% case val_game_sup:which_game(Id) of
+%%%     undefined -> false;
+%%%     _ -> true
+%%% end.                       
+                       false
+               end,
+    F = fun() ->
+                case mnesia:match_object(#account{login=Login,
+                                                  password=Password,
+                                                  _='_'}) of
+                    [#account{id=Id} = Account] ->
+                        Update = Account#account{last_time=erlang:localtime(),
+                                                 last_ip=Ip},
+                        mnesia:write(Update),
+                        case IsLogged(Ip) of
+                            true -> id_in_use;
+                            false -> {ok, Id}
+                        end;
+                    _ -> bad_credentials
+                end
+        end,
+    case mnesia:transaction(F) of
+        {atomic,Result} -> Result;
+        {aborted,Reason} -> {error,Reason}
+    end.
+
 -ifdef(euaeuaoeuaoeu).
 authorize({Name, Password, Ip}) ->
-    IsLogged = fun(_Id) ->
-    %% case val_game_sup:which_game(Id) of
-    %%     undefined -> false;
-    %%     _ -> true
-    %% end.                       
-                       
     F = fun() ->
                 case mnesia:match_object(#login{name=Name, _='_'}) of
                     [] -> no_such_user;
@@ -118,7 +140,7 @@ handle_message({"login", [Username, Password, Language]}, State) ->
             binary_to_list(Password),
             Ip(State)},
 
-    case {ok,0} of %%?MODULE:authorize(Auth) of
+    case ?MODULE:authorize(Auth) of
         {ok,_Id} ->
             io:format("log in: ~p~n", [Auth]),
             {ok, State};

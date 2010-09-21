@@ -1,0 +1,26 @@
+[20/Sep/2010:19:32:36 -0600] server crash for 0:0:0:0:0:FFFF:C6A3:D83C, reason: 
+"Error reading request: Not supported: {\"CONNECT\",\"194.109.153.5:6667\",\"HTTP/1.0\"}\n"
+
+[20/Sep/2010:19:32:37 -0600] server crash for 0:0:0:0:0:FFFF:55BE:3, reason: 
+"Error reading request: Not supported: {\"CONNECT\",\"213.92.8.7:31204\",\"HTTP/1.0\"}\n"
+
+[20/Sep/2010:19:32:37 -0600] access to /proxy.txt failed for 0:0:0:0:0:FFFF:55BE:3 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/proxy.txt"
+[20/Sep/2010:19:32:37 -0600] access to /proxy.txt failed for 0:0:0:0:0:FFFF:55BE:3 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/proxy.txt"
+[20/Sep/2010:19:32:37 -0600] server crash for 0:0:0:0:0:FFFF:55BE:3, reason: 
+"Error reading request: Not supported: {\"CONNECT\",\"213.92.8.7:31204\",\"HTTP/1.0\"}\n"
+
+[20/Sep/2010:19:32:37 -0600] server crash for 0:0:0:0:0:FFFF:55BE:3, reason: 
+"Error reading request: Not supported: {\"CONNECT\",\"213.92.8.7:31204\",\"HTTP/1.0\"}\n"
+
+[21/Sep/2010:00:22:02 -0600], traverse exit from apply: zen_mod_websocket:do => 
+{function_clause,[{zen_mod_websocket,'-build_challenge/3-lc$^0/1-0-',
+                                     [undefined]},
+                  {zen_mod_websocket,build_challenge,3},
+                  {zen_mod_websocket,do,1},
+                  {httpd_response,traverse_modules,2},
+                  {httpd_response,generate_and_send_response,1},
+                  {httpd_request_handler,handle_response,1},
+                  {gen_server,handle_msg,5},
+                  {proc_lib,init_p_do_apply,3}]}

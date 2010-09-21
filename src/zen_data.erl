@@ -69,12 +69,10 @@ handle_call({get_class_dicts, {Type,Attrib,Job,Family}}, _From, State) ->
     {reply, Dicts, State}
         ;
 handle_call({get_text, english, Key}, _From, State) ->
-    Reply = proplists:get_value(Key, get(text_english)),
-    {reply, Reply, State}
+    {reply, get_text_safely(Key, get(text_english)), State}
         ;
 handle_call({get_text, japanese, Key}, _From, State) ->
-    Reply = proplists:get_value(Key, get(text_japanese)),
-    {reply, Reply, State}
+    {reply, get_text_safely(Key, get(text_japanese)), State}
         ;
 handle_call(reload, _From, State) ->
     reload_dbs(),
@@ -91,6 +89,14 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+get_text_safely(Key, Db) ->
+    P = case proplists:get_value(Key, Db) of
+        undefined -> proplists:get_value(no_text, Db);
+        Text -> Text
+    end,
+    io:format("P = ~w~n", [P]),
+    P.
 
 consult_db(Name) ->
     Filename = code:priv_dir(zen) ++ "/" ++ atom_to_list(Name) ++ ".db",

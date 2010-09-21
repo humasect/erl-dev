@@ -13,18 +13,20 @@
 %% Login        %%
 %%--------------%%
 
--type(language() :: english | japanese).
-
 %%-define(DEV_ID, 100000).
 %%-define(USER_ID, 200000).
 
--record(login,
+-type(language() :: english | japanese).
+-type(user_group() :: dev | admin | editor | player).
+
+-record(account,
         {
-          %%id :: uinteger(),
+          id :: uinteger(),
+          login :: string(),
+          password :: string(),
           name :: string(),
-          %%password :: string(),
-          actor_id :: uinteger(),
           language=english :: language(),
+          actor_id :: uinteger(),
           create_time=erlang:localtime(),
           last_time,
           last_ip

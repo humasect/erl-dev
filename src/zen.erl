@@ -11,6 +11,9 @@
 
 %% API
 -export([start_all/0, stop_all/0, init_db/0]).
+-export([create_account/4,
+         remove_account/1,
+         list_accounts/0]).
 
 -include("zen.hrl").
 -include("mod_auth.hrl").
@@ -32,30 +35,71 @@ stop_all() ->
     inets:stop(),
     mnesia:stop().
 
+-spec create_account(string(), string(), string(), user_group()) ->
+                            ok | {error, term()}.
+%%% @doc add account.
+create_account(Login, Password, Name, Group) ->
+    %%make_world_t(Id),
+    ActorId = 0, %make_actor_t(Id, {0,0}, {player, undef, undef, undef}),
+
+    F = fun() ->
+                case mnesia:match_object(#account{login=Login, _='_'}) of
+                    [] -> ok;
+                    _ -> mnesia:abort(id_already_exists)
+                end,
+
+                Id = huma_db:next_id(account),
+                mnesia:write(#account{id=Id,
+                                      login=Login, password=Password,
+                                      name=Name,
+                                      actor_id=ActorId
+                                     }),
+                Id
+        end,
+
+    case mnesia:transaction(F) of
+        {atomic,Id} ->
+            zen_web:add_user(Id, Login, Password, Group);
+        Else -> Else
+    end.
+
+list_accounts() ->
+    mnesia:transaction(
+      fun() -> mnesia:match_object(#account{_='_'}) end).
+
+remove_account(Id) ->
+    %% @todo
+    %% kick user out of game.
+    mnesia:transaction(fun() -> mnesia:delete({account,Id}) end),
+    zen_web:delete_user(Id).
+
 -define(init_table(X,Y),
         huma_db:init_table(X, Y, record_info(fields, X))).
 -define(init_table(X,Y,T),
         huma_db:init_table(X, Y, record_info(fields, X), T)).
 
 init_db() ->
-    %% ?init_table(login, ordered_set,
-    %%             fun
-    %%                 ({login, Id, Name, Password, Language,
-    %%                   CreateTime, LastTime, LastIp}) ->
-    %%                     #login{id=Id, name=Name,
-    %%                            language=Language,
-    %%                            create_time=CreateTime,
-    %%                            last_time=LastTime,
-    %%                            last_ip=LastIp}
-    %%             end),
-
     ?init_table(httpd_user, bag),
     ?init_table(httpd_group, bag),
+    ?init_table(account, ordered_set,
+                fun
+                    ({account, Id, Login, Password, Name, ActorId,
+                      Language,
+                      CreateTime, LastTime, LastIp}) ->
+                        #account{id=Id,
+                                 login=Login, password=Password,
+                                 name=Name,
+                                 language=Language,
+                                 actor_id=ActorId,
+                                 create_time=CreateTime,
+                                 last_time=LastTime,
+                                 last_ip=LastIp}
+                end),
 
     %% ウーザを追加
-    %% make sure we have some users.
-    zen_web:add_user("dev", "dev", dev),
-    zen_web:add_user("humasect", "sect0huma", user),
+    %% make sure we have some accounts.
+    ?MODULE:create_account("dev", "dev", "Developer", dev),
+    ?MODULE:create_account("humasect", "sect0huma", "Lyndon Tremblay", player),
     ok.
 
 -ifdef(asdfasd).
@@ -75,23 +119,6 @@ init_db() ->
 %%%===================================================================
 
 -ifdef(nothing_spectacular).
-
-make_user_t(Name, Password) ->
-    case mnesia:match_object(#login{name=Name, _='_'}) of
-        [] -> ok;
-        _ -> mnesia:abort(user_already_exists)
-    end,
-
-    Id = huma_db:next_id(login),
-    make_world_t(Id),
-    ActorId = make_actor_t(Id, {0,0}, {player, undef, undef, undef}),
-    mnesia:write(#login{
-                    id=Id,
-                    name=Name,
-                    password=Password,
-                    actor_id=ActorId
-                   }),
-    Id.
 
 make_world_t(Id) ->
     case mnesia:read({world, Id}) of
