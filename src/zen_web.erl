@@ -73,7 +73,6 @@ authorize({Name, Password, _Ip}) ->
     %% end.                       
     %%                   false
     %%           end,
-
     case mod_auth:get_user(Name, ?webpidconf) of
         {ok, User = #httpd_user{user_data = Id}}
           when User#httpd_user.password =:= Password ->
@@ -90,10 +89,10 @@ config({auth_dir,Name}) ->
     {Realm,Groups} =
         case Name of
             "game" -> {"Gamelike", [dev, admin, player]};
+            "edoc" -> {"Zen Edoc", [dev, admin]};
             "stats" -> {"Gamelike Stats", [dev, admin, vendor]};
             _ -> {"Valhalla", [dev]}
         end,
-
     {?webconf(root) ++ "/" ++ Name ++ "/",
      [{auth_name,Realm},
       {auth_type,mnesia},
@@ -109,7 +108,6 @@ config(port) ->
         ;
 config(inets) ->
     {ok,Hostname} = inet:gethostname(),
-
     [{server_root, code:priv_dir(zen) ++ "/log"},
      {document_root, ?webconf(root)},
      {server_name, Hostname},
@@ -130,6 +128,7 @@ config(inets) ->
 
      {directory, ?webconf({auth_dir, "game"})},
      {directory, ?webconf({auth_dir, "stats"})},
+     {directory, ?webconf({auth_dir, "edoc"})},
 
      %% {directory, {Dir ++ "/game/", [{auth_name, "Gamelike"},
      %%                                {auth_type, mnesia},

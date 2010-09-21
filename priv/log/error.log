@@ -24,3 +24,7 @@
                   {httpd_request_handler,handle_response,1},
                   {gen_server,handle_msg,5},
                   {proc_lib,init_p_do_apply,3}]}
+[21/Sep/2010:02:17:54 -0600] access to /docs failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/docs"
+[21/Sep/2010:02:37:46 -0600] access to /edoc/gen_server.html failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/edoc/gen_server.html"

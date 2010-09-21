@@ -55,10 +55,6 @@ unwrap_message({Name, {obj,Props}}) -> {Name, Props};
 unwrap_message({Name, Props})       -> {Name, Props};
 unwrap_message(Msg)                 -> Msg.
 
-%%wrap_message([Msg]) -> {obj, [{result, Msg}]};
-%%wrap_message(Msg)   -> {obj, [{result, {obj, Msg}]}}.
-wrap_message(Msg)   -> {obj, [{result, {obj, Msg}}]}.
-
 send_result(State, Result) ->
     send_object(State, [{result, {obj, [Result]}}]).
 
@@ -129,14 +125,17 @@ authorize({Name, Password, Ip}) ->
     end.
 -endif().
 
-handle_message({"login", [Username, Password, Language]}, State) ->
+handle_message({"login", [Login, Password]}, State) ->
+    handle_message({"login", [Login, Password, english]}, State)
+        ;
+handle_message({"login", [Login, Password, Language]}, State) ->
     Ip = fun ({web, WS, _}) ->
                  WS:get(peer_addr);
              ({tcp, S, _}) ->
                  {Address,_Port} = inet:peername(S),
                  Address
          end,
-    Auth = {binary_to_list(Username),
+    Auth = {binary_to_list(Login),
             binary_to_list(Password),
             Ip(State)},
 

@@ -21,7 +21,6 @@
 
 (defun log (msg)
   (with-current-buffer (message-buffer)
-    
   ;;(set-buffer (message-buffer))
   ;;(buffer-end 1)
     (set-window-point (get-buffer-window (message-buffer)) (point-max))
@@ -33,7 +32,6 @@
 
 (defun lco-send (obj)
   (setq str (json-encode obj))
-  ;;(log (format "send %s" str))
   (process-send-string lco-process str))
 
 ;;--------------------------------------------------------------
