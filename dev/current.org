@@ -1,0 +1,53 @@
+#+TITLE: /Current Work/
+
+#+OPTIONS: ^:{}
+
+* Emacs
+
+** TODO iswitchでタブコンプリート!
+** TODO huma-project.elでgitとsvnコマンドを直す
+   - user-mail-address シンボルはvoid
+** DONE すべてのorg-modeファイルをthemiddle/org/に移動する
+   CLOSED: [2010-09-16 Thu 18:08]
+** TODO user-mail-addressを直す！！
+** TODO org-babel
+** TODO freeze .emacs customizations into huma-custom.el
+
+* vre_server Previous Developer
+
+** TODO getting the vre_user.erl API to a simple API
+   to manipulate user record
+** TODO move the actual login
+   process spawn and such to authenticator.erl
+** TODO remove the #user.person
+   and put it in another table
+   and have a separate server command
+   (enter_world() or such) to activate
+   the person object
+
+* vre_server開発
+
+** TODO vre_serverを/lib/の外に移動する
+** TODO vre_server.appがvre.appに名の変えて
+** TODO ソースに@todoを探しとここに入り込んで
+** TODO ソースに@specを探しと-spec()で変更す.
+
+* vre_serverネットワーク
+
+** TODO vre_netserver_supを消す
+** DONE address in useを直す =)
+   CLOSED: [2010-09-16 Thu 14:11]
+** TODO ..そしてvalのネットワーク道具からコピーする
+** TODO vre_protocol JSONとBSON
+   [[http://github.com/JacobVorreuter/emongo/blob/master/src/emongo_bson.erl][github]]
+
+* vre_serverデータベース
+
+** TODO ユーザを追加の問題
+#+BEGIN_SRC erlang
+   vre_admin:new_user("test", test, "test", 0, developer).
+
+   %% それから：
+
+   {error,{badrecord,user},{bad_user_record,{"test","developer"}}}
+#+END_SRC

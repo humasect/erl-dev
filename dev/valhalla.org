@@ -1,0 +1,34 @@
+#+TITLE: /Valhalla Game Server/
+
+#+OPTIONS: ^:{}
+
+* Overview
+
+ - actors have either 1) a client+socket PID, 2) an AI PID. 
+ - has several kind of connections: http restful, tcp socket, web socket.
+ - has several interfaces: irc, web, telnet, desktop client, emacs.
+
+* Developer Notes
+
+ - should be ONE(1) mnesia transaction for each turn for each world...
+
+* Tasks
+
+** Generating
+
+*** TODO [re]use seed {A,B,C}
+*** TODO edit/parse svg files with server side include?
+
+** Network
+
+*** TODO restful api with login/out
+*** TODO implement ('val_tcp') websockets
+    [[http://armstrongonsoftware.blogspot.com/2009/12/comet-is-dead-long-live-websockets.html]]
+
+** Turns
+
+*** TODO database cycle
+    open (read) transaction -> apply turn -> close (write) transaction
+
+
+#+INCLUDE: footer.hrg

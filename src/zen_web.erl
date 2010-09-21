@@ -90,6 +90,7 @@ config({auth_dir,Name}) ->
         case Name of
             "game" -> {"Gamelike", [dev, admin, player]};
             "edoc" -> {"Zen Edoc", [dev, admin]};
+            "org" -> {"Zen Org", [dev, admin]};
             "stats" -> {"Gamelike Stats", [dev, admin, vendor]};
             _ -> {"Valhalla", [dev]}
         end,
@@ -129,11 +130,8 @@ config(inets) ->
      {directory, ?webconf({auth_dir, "game"})},
      {directory, ?webconf({auth_dir, "stats"})},
      {directory, ?webconf({auth_dir, "edoc"})},
+     {directory, ?webconf({auth_dir, "org"})},
 
-     %% {directory, {Dir ++ "/game/", [{auth_name, "Gamelike"},
-     %%                                {auth_type, mnesia},
-     %%                                {auth_access_password, ?AUTH_PASS},
-     %%                               {require_group, ["dev","gm","player"]}]}},
      {modules, [zen_mod_websocket,
                 mod_alias,
                 %%mod_security,

@@ -1,0 +1,18 @@
+* Introduction
+
+** TODO disallow dev login from anywhere except localhost
+** TODO add logger from VRE
+
+* Emacs
+
+pjb: point-to-register --> C-x r SPC
+pjb: Then C-x r j to jump back to the register where you stored the point.
+
+* Client
+
+Evaluate this into Emacs and type in login name and password:
+
+#+BEGIN_SRC emacs-lisp
+(load "zenclient")
+(lco)
+#+END_SRC

@@ -1,0 +1,27 @@
+#+TITLE: /Gamelike Prototype/
+
+The prototype offline application runs on Mac OS X and iPhone and iPad.
+It was built in one month using:
+
+- real time OpenGL exported from Blender scripts,
+- scalable vector graphics for textures and UI and actors,
+- dynamic lighting
+- beautiful Core Animation movements, actions and effects,
+- turn based combat and movement,
+- inventory and equipment,
+- random room selection and map,
+- warps,
+- AI,
+- generated items and monsters.
+
+* Status
+
+  It is currently being ported to the [[webclient.org][Web client]].
+  There has been initial networking support being added if it were to be
+  continued to be supported as an official game client for
+  the [[valhalla.org][Valhalla server]].
+
+* Screenshots
+
+[[20100705100036.png]]
+[[20100720191411.png]]

@@ -1,0 +1,32 @@
+#+TITLE: /Web Client/
+
+* Introduction
+
+See also [[file:valhalla][Valhalla Server]].
+
+* Tasks
+
+** Code
+
+*** TODO jquery css3のアニメーション
+*** TODO jqueryセレクター
+*** TODO replace dom.js with jquery
+
+** Browser
+
+*** TODO mouse and touch controls
+
+** Resources
+
+*** TODO <audio>タグ
+
+** Graphics
+
+*** TODO SVG animation tests
+*** TODO dungeon name
+*** TODO weapon swing and shine slash effect
+*** TODO menu sheets (inventory, profile, map)
+
+
+#+INCLUDE: "footer.hrg"
+

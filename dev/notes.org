@@ -1,0 +1,8 @@
+* Tasks
+** TODO fix something
+   
+   [[file:~/hv/code/zen/dev/export-org.el]]
+** TODO implement org-mode url capture
+   can just use C-c c to capture yank
+   http://orgmode.org/worg/org-contrib/org-protocol.php
+   

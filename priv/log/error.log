@@ -28,3 +28,22 @@
 "httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/docs"
 [21/Sep/2010:02:37:46 -0600] access to /edoc/gen_server.html failed for 0:0:0:0:0:0:0:1 reason: 
 "httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/edoc/gen_server.html"
+[21/Sep/2010:04:01:54 -0600] access to /icons/blank.gif failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/icons/blank.gif"
+[21/Sep/2010:04:01:54 -0600] access to /icons/layout.gif failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/icons/layout.gif"
+[21/Sep/2010:04:22:57 -0600] access to /org/valhalla failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/org/valhalla"
+[21/Sep/2010:04:28:40 -0600] server crash for 0:0:0:0:0:0:0:1, reason: 
+"Error reading request: No request received on keep-alive connectionbefore server side timeout"
+
+[21/Sep/2010:06:24:32 -0600] access to /org/sitemap.html failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/org/sitemap.html"
+[21/Sep/2010:07:27:17 -0600] access to /org/gamelike.html failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/org/gamelike.html"
+[21/Sep/2010:07:27:21 -0600] access to /org/gamelike.html failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/org/gamelike.html"
+[21/Sep/2010:07:29:43 -0600] access to /org/gamelike.html failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/org/gamelike.html"
+[21/Sep/2010:07:29:44 -0600] access to /org/sitemap.html failed for 0:0:0:0:0:0:0:1 reason: 
+"httpd_file: Can't access/Users/humasect/hv/code/zen/priv/www/org/sitemap.html"

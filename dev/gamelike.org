@@ -1,0 +1,33 @@
+#+TITLE: /Gamelike/
+
+#+OPTIONS: ^:{}
+
+* Overview
+
+One is able to make their own game; this is how flexible is the
+dynamic nature of each game session.
+
+Any screen/circumstance should be sufficient to decide the next move,
+previous knowledge of what happened in passed/past turns is not required.
+Pick up/put down..
+
+* Character
+
+** female/male/neutral gender alignment system
+Calculated by how the player plays.
+
+** remember stuff across game sessions
+Opening new quests and dungeons, items or abilities or other rewards.
+
+** TODO status hp/sp exp/jexp
+
+* Map
+
+** Maps are made of screen-size cells.
+Configurable scrolling
+
+** TODO world map
+** TODO generate dungeon
+** TODO generate tiles
+
+#+INCLUDE: "footer.hrg"

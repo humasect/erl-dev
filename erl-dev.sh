@@ -2,5 +2,5 @@
 
 erl -pa $PWD/ebin \
     -sname erl-dev \
-    -boot start_sasl -config dev \
+    -boot start_sasl -config erl.config \
     -eval 'code:load_abs("ebin/user_default").'

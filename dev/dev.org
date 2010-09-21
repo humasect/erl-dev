@@ -1,0 +1,39 @@
+#+TITLE: /Development Notes/
+
+#+OPTIONS: ^:{}
+
+始めの発動で`erl-dev.sh'を行動する。それから入力し:
+#+BEGIN_SRC erlang
+zen:start_all().
+#+END_SRC
+
+* 開発環境
+
+** TODO wrangler-0.9をコンパイル／インストール
+** TODO F1キー押せばesenseの発動が失敗する
+
+* オーディオ
+
+** TODO CCライセンスなdrum kitあるがの手入する
+   percussive turnsのため、「chromeの実験」を見て
+** TODO 「chromeの実験」のリンクを与える下さい
+** TODO 雰囲気(ふんいき）な音の生成する？generated ambient sound?
+** TODO SVGアニメーションのイベントを研究する
+
+* 公式
+
+** TODO 公式／入門ウェブサイト
+** TODO ストーリ
+** TODO タイトル画面
+
+* ゲームシステム
+
+  [[file:gamelike.org][それ]]を読めば分かる。
+
+* 職場環境
+
+** DONE themiddleのリーポが作る
+   CLOSED: [2010-09-16 Thu 15:39]
+   http://github.com/humasect/themiddle
+
+
