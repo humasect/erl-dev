@@ -6,6 +6,7 @@
 ** TODO print IP address
 ** TODO logging!
 ** TODO ping/pong timeout
+** TODO one table per game: vre_account   val_account
 
 * Emacs
 

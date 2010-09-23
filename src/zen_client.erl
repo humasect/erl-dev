@@ -9,7 +9,7 @@
 -module(zen_client).
 -author('humasect@gmail.com').
 
--export([loop/1, send_object/2]).
+-export([loop/1]).
 
 -define(TCP_TIMEOUT, 60000).
 -export([authorize/1]).
@@ -33,7 +33,7 @@ loop(State = {tcp, Socket, _Status}) ->
         {tcp,_,Data} ->
             closed(State, {invalid_data, Data});
         {send,Object} ->
-            send_object(State, Object),
+            send(State, Object),
             ?MODULE:loop(State);
         Else ->
             closed(State, Else)
@@ -53,29 +53,18 @@ close_game({SockType, Socket, _}) ->
 %%% messaging
 %%%===================================================================
 
-unwrap_message([Msg])               -> unwrap_message(Msg);
-unwrap_message({obj,Object})        -> unwrap_message(Object);
-unwrap_message({Name, {obj,Props}}) -> {Name, Props};
-unwrap_message({Name, Props})       -> {Name, Props};
-unwrap_message(Msg)                 -> Msg.
-
-send_result(State, Result) ->
-    send_object(State, [{result, {obj, [Result]}}]).
-
 process_data(Data, Client) ->
-    {ok,Msg1,_Remain} = json:decode(Data),
-    Msg = unwrap_message(Msg1),
+    %%{ok,Msg1,_Remain} = jsonerl:decode(Data),
+    %%Msg = unwrap_message(Msg1),
+    Msg = jsonerl:decode(Data),
     io:format("message = ~p~n", [Msg]),
-
     case Msg of
-        {"client", RealMsg} ->
-            handle_message(unwrap_message(RealMsg), Client);
-        {Module, _} ->
-            send_result(Client,
-                        {error, [unknown_module, list_to_binary(Module)]})
+        {{<<"client">>, RealMsg}} ->
+            handle_message(RealMsg, Client);
+        Else ->
+            send(Client, {{error, unknown_message}}),
+            {unknown_message, Else}
     end.
-    %FName = list_to_existing_atom("msg_"++Name),
-    %erlang:apply(?MODULE, FName, [State|Args]).
 
 authorize({Login, Password, Ip}) ->
     IsLogged = fun(_Id) ->
@@ -93,7 +82,7 @@ authorize({Login, Password, Ip}) ->
                         Update = Account#account{last_time=erlang:localtime(),
                                                  last_ip=Ip},
                         mnesia:write(Update),
-                        case IsLogged(Ip) of
+                        case IsLogged(Id) of
                             true -> id_in_use;
                             false ->
                                 Group = zen_web:user_group(Login),
@@ -107,45 +96,37 @@ authorize({Login, Password, Ip}) ->
         {aborted,Reason} -> {error,Reason}
     end.
 
-handle_message({"login", [Login, Password]},
-               State = {SockType, Socket, waiting_auth}) ->
-    Ip = fun (web, WS) ->
-                 WS:get(peer_addr);
-             (tcp, S) ->
-                 {Address,_Port} = inet:peername(S),
-                 Address
-         end,
+handle_message({{<<"login">>, [Login, Password]}},
+               Client = {SockType, Socket, waiting_auth}) ->
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
-            Ip(SockType, Socket)},
-
+            ip_address(SockType, Socket)},
     case ?MODULE:authorize(Auth) of
         {ok,Group,Id,Name} ->
             io:format("log in: ~p~n", [Auth]),
-            send_result(State, {ok, [Group, Id, list_to_binary(Name)]}),
+            send(Client, {{result, {{ok, [Group, Id, Name]}}}}),
             {ok, {SockType, Socket, {in_game, Id, undefined}}};
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
-            Lang = english,
-            Text = zen_data:get_text(Lang, Else),
-            send_result(State, {error, list_to_binary(Text)}),
+            %%Text = zen_data:get_text(Lang, Else),
+            send(Client, {{result, {{error, list_to_binary(Else)}}}}),
             {error, Else, Auth}
     end
-    ;
-handle_message({"command", <<$/,Cmd/binary>>}, State) ->
-    io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
-    {ok, State}
         ;
-handle_message({"say", Text},
-               State = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
-    zen_tcp:broadcast({person_said, Text}),
-    {ok, State}
-    ;
-handle_message(Msg, State = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
+handle_message({{<<"command">>, <<$/,Cmd/binary>>}}, Client) ->
+    io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
+    {ok, Client}
+        ;
+handle_message({{<<"say">>, Text}},
+               Client = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
+    zen_tcp:broadcast({{person_said, Text}}),
+    {ok, Client}
+        ;
+handle_message(Msg, Client = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
     %%Game = val_game_sup:which_game(Id),
     %%gen_server:call(game, Msg),
     io:format("game message: ~p~n", [Msg]),
-    {ok, State}
+    {ok, Client}
         ;
 handle_message(Msg, State) ->
     closed(State, {error, unhandled_message, Msg}).
@@ -168,17 +149,17 @@ send_raw({web, WS, _Status}, Data) ->
 send_raw({tcp, S, _Status}, Data) ->
     gen_tcp:send(S, Data).
 
-send_object(Client, Object) ->
+send(Client, Object) ->
     Send = case is_list(Object) of
                true -> Object;
                false -> [Object]
            end,
-    send_raw(Client, [json:encode({obj, Send}), $\n]).
+    send_raw(Client, [jsonerl:encode(Send), $\n]).
 
--ifdef(aijosdfioje).
-ip_address(websocket, WS) ->
+ip_address(web, WS) ->
     WS:get(peer_addr);
-ip_address(socket, S) ->
-    {Address,_Port} = inet:peername(S),
+ip_address(tcp, S) ->
+    {ok,{Address,_Port}} = inet:peername(S),
     Address.
--endif.
+
+

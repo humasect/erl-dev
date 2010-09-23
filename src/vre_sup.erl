@@ -4,10 +4,9 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 22 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(zen_sup).
--author('humasect@gmail.com').
+-module(vre_sup).
 -behaviour(supervisor).
 
 %% API
@@ -30,21 +29,16 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
-    {ok, {{one_for_one, 1, 60},
-     [
-      %% zen_logger
+    SupFlags = {one_for_one, 10, 3600},
 
-      {zen_tcp, {zen_tcp, start_link, []},
-       permanent, 2000, worker, [zen_tcp]},
+    Restart = permanent,
+    Shutdown = 2000,
+    Type = worker,
 
-      {zen_data, {zen_data, start_link, []},
-       permanent, 2000, worker, [zen_data]},
+    UserSup = {'AName', {'AModule', start_link, []},
+              Restart, Shutdown, Type, ['AModule']},
 
-      {zen_irc_sup, {zen_irc_sup, start_link, []},
-       permanent, infinity, supervisor, [zen_irc_sup]}
-
-     ]}
-    }.
+    {ok, {SupFlags, [UserSup]}}.
 
 %%%===================================================================
 %%% Internal functions

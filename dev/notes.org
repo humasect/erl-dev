@@ -6,3 +6,4 @@
    can just use C-c c to capture yank
    http://orgmode.org/worg/org-contrib/org-protocol.php
    
+** TODO use emacs and inets for code-reload ll().

@@ -83,9 +83,9 @@ init_db() ->
     ?init_table(httpd_group, bag),
     ?init_table(account, ordered_set,
                 fun
-                    ({account, Id, Login, Password, Name, ActorId,
-                      Language,
-                      CreateTime, LastTime, LastIp}) ->
+                    ({account, Id, Login, Password, Name, Language,
+                      ActorId,
+                      CreateTime, LastTime, LastIp, _Empty}) ->
                         #account{id=Id,
                                  login=Login, password=Password,
                                  name=Name,
