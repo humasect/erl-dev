@@ -7,3 +7,4 @@
    http://orgmode.org/worg/org-contrib/org-protocol.php
    
 ** TODO use emacs and inets for code-reload ll().
+   use for generate org-html and edoc

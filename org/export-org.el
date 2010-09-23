@@ -6,8 +6,8 @@
 
 (require 'org-publish)
 
-(defconst zen-files-root "~/Hoovy/code/zen/dev")
-(defconst zen-www-root "~/Hoovy/code/zen/priv/www/org")
+(defconst zen-files-root "~/Hoovy/code/erl-dev/org")
+(defconst zen-www-root "~/Hoovy/code/erl-dev/zen/www/org")
 
 (defun zen-publish ()
   (interactive)
