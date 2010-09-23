@@ -1,5 +1,10 @@
 *.beam
 user_default.erl
 log/*
-priv/log/*
+zen/priv/log/*
+zen/priv/www/edoc
+zen/priv/www/dev
 .DS_Store
+
+oldsrc
+Mnesia.erl-dev@McHoovy
