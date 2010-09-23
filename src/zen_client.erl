@@ -11,10 +11,10 @@
 
 -export([loop/1]).
 
--define(TCP_TIMEOUT, 60000).
+-define(TCP_TIMEOUT, 120*1000).
 -export([authorize/1]).
 
--include("zen.hrl").
+-include("zen_account.hrl").
 
 %%%===================================================================
 %%% API
@@ -56,13 +56,13 @@ close_game({SockType, Socket, _}) ->
 process_data(Data, Client) ->
     %%{ok,Msg1,_Remain} = jsonerl:decode(Data),
     %%Msg = unwrap_message(Msg1),
-    Msg = jsonerl:decode(Data),
+    Msg = jsx:json_to_term(Data),
     io:format("message = ~p~n", [Msg]),
     case Msg of
-        {{<<"client">>, RealMsg}} ->
+        [{<<"client">>, RealMsg}] ->
             handle_message(RealMsg, Client);
         Else ->
-            send(Client, {{error, unknown_message}}),
+            send(Client, [{error, unknown_message}]),
             {unknown_message, Else}
     end.
 
@@ -96,7 +96,7 @@ authorize({Login, Password, Ip}) ->
         {aborted,Reason} -> {error,Reason}
     end.
 
-handle_message({{<<"login">>, [Login, Password]}},
+handle_message([{<<"login">>, [Login, Password]}],
                Client = {SockType, Socket, waiting_auth}) ->
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
@@ -104,22 +104,22 @@ handle_message({{<<"login">>, [Login, Password]}},
     case ?MODULE:authorize(Auth) of
         {ok,Group,Id,Name} ->
             io:format("log in: ~p~n", [Auth]),
-            send(Client, {{result, {{ok, [Group, Id, Name]}}}}),
+            send(Client, [{result, [{ok, [atom_to_list(Group),Id,Name]}]}]),
             {ok, {SockType, Socket, {in_game, Id, undefined}}};
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
             %%Text = zen_data:get_text(Lang, Else),
-            send(Client, {{result, {{error, list_to_binary(Else)}}}}),
+            send(Client, [{result, [{error, Else}]}]),
             {error, Else, Auth}
     end
         ;
-handle_message({{<<"command">>, <<$/,Cmd/binary>>}}, Client) ->
+handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
     io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
     {ok, Client}
         ;
-handle_message({{<<"say">>, Text}},
+handle_message([{<<"say">>, Text}],
                Client = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
-    zen_tcp:broadcast({{person_said, Text}}),
+    zen_tcp:broadcast([{person_said, Text}]),
     {ok, Client}
         ;
 handle_message(Msg, Client = {_SockType, _Socket, {in_game,_Id,_Game}}) ->
@@ -150,11 +150,8 @@ send_raw({tcp, S, _Status}, Data) ->
     gen_tcp:send(S, Data).
 
 send(Client, Object) ->
-    Send = case is_list(Object) of
-               true -> Object;
-               false -> [Object]
-           end,
-    send_raw(Client, [jsonerl:encode(Send), $\n]).
+    io:format("aoeuaoeu ~p~n", [Object]),
+    send_raw(Client, [jsx:term_to_json(Object), $\n]).
 
 ip_address(web, WS) ->
     WS:get(peer_addr);

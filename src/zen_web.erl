@@ -13,7 +13,7 @@
 -export([start/0, restart/0, stop/0]).
 -export([add_user/4, delete_user/1, user_group/1]).
 
--include("zen.hrl").
+-include("zen_account.hrl").
 -include("mod_auth.hrl").
 
 -define(AUTH_PASS, "valhalla").
@@ -84,11 +84,11 @@ user_group(Login) ->
 config({auth_dir,Name}) ->
     {Realm,Groups} =
         case Name of
-            "game" -> {"Gamelike", [dev, admin, player]};
-            "edoc" -> {"Zen Edoc", [dev, admin, vendor]};
-            "org" -> {"Zen Org", [dev, admin, vendor]};
-            "stats" -> {"Gamelike Stats", [dev, admin, vendor]};
-            _ -> {"Valhalla", [dev]}
+            "edoc"  -> {"Zen Edoc",   [dev, admin, vendor]};
+            "dev"   -> {"Zen Dev",    [dev, admin, vendor]};
+            "game"  -> {"Gamelike",   [dev, admin, player]};
+            "stats" -> {"Game Stats", [dev, admin, player]};
+            _       -> {"Zen", [dev]}
         end,
     {?webconf(root) ++ "/" ++ Name ++ "/",
      [{auth_name,Realm},
@@ -97,18 +97,14 @@ config({auth_dir,Name}) ->
       {require_group, Groups}]}
         ;
 config(root) ->
-    code:priv_dir(zen) ++ "/www"
-        ;
-config(port) ->
-    {ok,Port} = application:get_env(zen, web_port),
-    Port
+    zen_app:priv_dir("www")
         ;
 config(inets) ->
     {ok,Hostname} = inet:gethostname(),
-    [{server_root, code:priv_dir(zen) ++ "/log"},
+    [{server_root, zen_app:priv_dir("log")},
      {document_root, ?webconf(root)},
      {server_name, Hostname},
-     {port, ?webconf(port)},
+     {port, zen_app:get_env(web_port)},
      {bind_address, any},
 
      {error_log, "error.log"},
@@ -126,7 +122,7 @@ config(inets) ->
      {directory, ?webconf({auth_dir, "game"})},
      {directory, ?webconf({auth_dir, "stats"})},
      {directory, ?webconf({auth_dir, "edoc"})},
-     {directory, ?webconf({auth_dir, "org"})},
+     {directory, ?webconf({auth_dir, "dev"})},
 
      {modules, [zen_mod_websocket,
                 mod_alias,
@@ -138,6 +134,6 @@ config(inets) ->
         ;
 config({pid_at,DirName}) ->
     [{dir, ?webconf(root) ++ "/"++DirName++"/"},
-     {port, ?webconf(port)},
+     {port, zen_app:get_env(web_port)},
      {authPassword,?AUTH_PASS}
     ].

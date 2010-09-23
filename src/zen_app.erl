@@ -10,6 +10,9 @@
 -author('humasect@gmail.com').
 -behaviour(application).
 
+%% API
+-export([priv_dir/0, priv_dir/1, get_env/1]).
+
 %% Application callbacks
 -export([start/2, stop/1]).
 
@@ -30,6 +33,16 @@ start(_StartType, _StartArgs) ->
 
 stop(_State) ->
     ok.
+
+priv_dir() ->
+    code:priv_dir(zen).
+
+priv_dir(Name) ->
+    priv_dir() ++ "/" ++ Name.
+
+get_env(Key) ->
+    {ok,Value} = application:get_env(zen, Key),
+    Value.
 
 %%%===================================================================
 %%% Internal functions

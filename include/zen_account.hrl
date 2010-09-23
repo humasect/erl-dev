@@ -9,10 +9,6 @@
 
 -include("huma.hrl").
 
-%%--------------%%
-%% Login        %%
-%%--------------%%
-
 %%-define(DEV_ID, 100000).
 %%-define(USER_ID, 200000).
 
