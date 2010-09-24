@@ -116,7 +116,7 @@
   (lco-init)
 
   (lco-init-net user pass)
-  (lco-send `(:client (:login [,user ,pass])))
+  (lco-send `(:client (:login [,user ,pass "japanese"])))
   )
 
 (defun lco-quit ()

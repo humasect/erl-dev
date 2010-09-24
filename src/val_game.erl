@@ -6,40 +6,49 @@
 %%% @end
 %%% Created : 23 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(val_game_sup).
+-module(val_game).
 -author('humasect@gmail.com').
--behaviour(supervisor).
+-behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
-%% Supervisor callbacks
--export([init/1]).
+%% gen_server callbacks
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2,
+         terminate/2, code_change/3]).
 
--define(SERVER, ?MODULE).
+-define(SERVER, ?MODULE). 
 
-%%%===================================================================
-%%% API functions
-%%%===================================================================
+-include("huma.hrl").
 
-start_link() ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, []).
+-record(game, {login_id :: uinteger()}).
 
 %%%===================================================================
-%%% Supervisor callbacks
+%%% API
 %%%===================================================================
 
-init([]) ->
-    SupFlags = {one_for_one, 10, 3600},
+start_link(Id) ->
+    gen_server:start_link({local, ?SERVER}, ?MODULE, [Id], []).
 
-    Restart = permanent,
-    Shutdown = 2000,
-    Type = worker,
+%%%===================================================================
+%%% gen_server callbacks
+%%%===================================================================
 
-    AChild = {'AName', {'AModule', start_link, []},
-              Restart, Shutdown, Type, ['AModule']},
+init([Id]) ->
+    {ok, #game{login_id=Id}}.
 
-    {ok, {SupFlags, [AChild]}}.
+handle_call([{<<"move">>, Angle}], _From, State) ->
+    io:format("ok,move ~p~n", [Angle]),
+    {reply, ok, State}
+        ;
+handle_call(_Request, _From, State) ->
+    {reply, ok, State}.
+
+handle_cast(_Msg, State) -> {noreply, State}.
+handle_info(_Info, State) -> {noreply, State}.
+
+terminate(_Reason, _State) -> ok.
+code_change(_OldVsn, State, _Extra) -> {ok, State}.
 
 %%%===================================================================
 %%% Internal functions

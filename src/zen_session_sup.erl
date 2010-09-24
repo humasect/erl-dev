@@ -4,14 +4,16 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 17 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 23 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(zen_sup).
+-module(zen_session_sup).
 -author('humasect@gmail.com').
 -behaviour(supervisor).
 
 %% API
 -export([start_link/0]).
+-export([start_session/2, stop_session/1]).
+-export([which_session/1, all_sessions/0]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -25,28 +27,39 @@
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
+start_session(Id, Module) ->
+    Spec = {Id, {Module, start_link, [Id]},
+            permanent, 2000, worker, [Module]},
+    case supervisor:start_child(?SERVER, Spec) of
+        {ok,Child} -> Child;
+        {ok,Child,_} -> Child;
+        {error,{already_started,Child}} -> Child;
+        Else -> throw(Else)
+    end.
+
+stop_session(Id) ->
+    %% only called from zen_client:close_client
+    supervisor:terminate_child(?SERVER, Id),
+    supervisor:delete_child(?SERVER, Id),
+    {closed,Id}.
+
+which_session(Name) ->
+    L = [C || {Id,C,_,_} <- supervisor:which_children(?SERVER), Id == Name],
+    case L of
+        [Head] -> Head;
+        _ -> undefined
+    end.
+
+all_sessions() ->
+    [C || {_,C,_,_} <- supervisor:which_children(?SERVER)].
+
 %%%===================================================================
 %%% Supervisor callbacks
 %%%===================================================================
 
 init([]) ->
-    {ok, {{one_for_one, 1, 6000},
-     [
-      %% zen_logger
-
-      {zen_tcp, {zen_tcp, start_link, []},
-       permanent, 2000, worker, [zen_tcp]},
-
-      {zen_data, {zen_data, start_link, []},
-       permanent, 2000, worker, [zen_data]},
-
-      {zen_irc_sup, {zen_irc_sup, start_link, []},
-       permanent, infinity, supervisor, [zen_irc_sup]},
-
-      {zen_session_sup, {zen_session_sup, start_link, []},
-       permanent, infinity, supervisor, [zen_session_sup]}
-     ]}
-    }.
+    SupFlags = {one_for_one, 10, 3600},
+    {ok, {SupFlags, []}}.
 
 %%%===================================================================
 %%% Internal functions

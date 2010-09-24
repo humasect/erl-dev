@@ -54,11 +54,11 @@ loop(Client = #tcp_client{socket=Socket}) ->
             closed(Client, timeout)
     end.
 
-close_game({SockType, Socket, #in_game{id=Id, module=Mod}}) ->
+close_client({SockType, Socket, #in_game{id=Id, module=Mod}}) ->
     Mod:client_stop(Id),
     {SockType, Socket, closed}
         ;
-close_game({SockType, Socket, _}) ->
+close_client({SockType, Socket, _}) ->
     {SockType, Socket, closed}.
 
 %%%===================================================================
@@ -76,14 +76,13 @@ process_data(Data, Client) ->
             {error, unknown_message, Else}
     end.
 
-authorize({Login, Password, Ip, Mod}) ->
-    IsLogged = fun(_Id) ->
-%%% case val_game_sup:which_game(Id) of
-%%%     undefined -> false;
-%%%     _ -> true
-%%% end.                       
-                       false
-               end,
+is_playing(Id) ->
+    case zen_session_sup:which_session(Id) of
+        undefined -> false;
+        _ -> true
+    end.
+
+authorize({Login, Password, Ip, _Mod}) ->
     F = fun() ->
                 case mnesia:match_object(#account{login=Login,
                                                   password=Password,
@@ -93,7 +92,7 @@ authorize({Login, Password, Ip, Mod}) ->
                                                  last_ip=Ip,
                                                  auth_count=Count+1},
                         mnesia:write(Update),
-                        case IsLogged(Id) of
+                        case is_playing(Id) of
                             true -> id_in_use;
                             false ->
                                 Group = zen_web:user_group(Login),
@@ -111,8 +110,8 @@ handle_message([{<<"login">>, Creds}],
                Client = {SockType, Socket, waiting_auth}) ->
     {Mod,Login,Password,_Language} =
         case Creds of
-            [User,Pass] -> {vre_user_sup,User,Pass,english};
-            [User,Pass,Lang] -> {val_game_sup,User,Pass,Lang}
+            [User,Pass] -> {vre_game,User,Pass,english};
+            [User,Pass,Lang] -> {val_game,User,Pass,Lang}
         end,
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
@@ -121,8 +120,7 @@ handle_message([{<<"login">>, Creds}],
     case ?MODULE:authorize(Auth) of
         {ok,Group,Id,Name} ->
             io:format("log in: ~p~n", [Auth]),
-            %%Game = Mod:client_start(Id),
-            Game = 1,
+            Game = zen_session_sup:start_session(Id, Mod),
             send(Client, [{result,
                            [{ok,
                              [atom_to_binary(Group, latin1),
@@ -147,10 +145,10 @@ handle_message([{<<"say">>, Text}],
     zen_tcp:broadcast([{person_said, Text}]),
     {ok, Client}
         ;
-handle_message(Msg, Client = {_SockType, _Socket, #in_game{}}) ->
-    %%Game = val_game_sup:which_game(Id),
-    %%gen_server:call(game, Msg),
+handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
     io:format("game message: ~p~n", [Msg]),
+    %%Game = zen_session_sup:which_session(Id),
+    gen_server:call(Game, Msg),
     {ok, Client}
         ;
 handle_message(Msg, State) ->
@@ -162,11 +160,11 @@ handle_message(Msg, State) ->
 
 closed(Client = #web_client{socket=WS}, Reason) ->
     io:format("web socket: ~w ~p.~n", [WS:get(socket), Reason]),
-    close_game(Client)
+    close_client(Client)
         ;
 closed(Client = #tcp_client{socket=S}, Reason) ->     
     io:format("tcp socket: ~w ~p.~n", [S, Reason]),
-    close_game(Client).
+    close_client(Client).
 
 send_raw(#web_client{socket=WS}, Data) ->
     WS:send(Data)
