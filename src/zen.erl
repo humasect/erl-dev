@@ -15,7 +15,7 @@
          remove_account/1,
          list_accounts/0]).
 
--include("zen.hrl").
+-include("zen_account.hrl").
 -include("mod_auth.hrl").
 
 %%%===================================================================
@@ -85,7 +85,7 @@ init_db() ->
                 fun
                     ({account, Id, Login, Password, Name, Language,
                       ActorId,
-                      CreateTime, LastTime, LastIp, _Empty}) ->
+                      CreateTime, LastTime, LastIp}) ->
                         #account{id=Id,
                                  login=Login, password=Password,
                                  name=Name,
@@ -93,7 +93,8 @@ init_db() ->
                                  actor_id=ActorId,
                                  create_time=CreateTime,
                                  last_time=LastTime,
-                                 last_ip=LastIp}
+                                 last_ip=LastIp,
+                                 auth_count=0}
                 end),
 
     %% ウーザを追加

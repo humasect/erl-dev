@@ -25,5 +25,6 @@
           actor_id :: uinteger(),
           create_time=erlang:localtime(),
           last_time,
-          last_ip
+          last_ip,
+          auth_count=0 :: uinteger()
         }).

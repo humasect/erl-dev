@@ -52,7 +52,7 @@
 %%%===================================================================
 
 start_link() ->
-    {ok,Port} = application:get_env(zen, tcp_port),
+    Port = zen_app:get_env(tcp_port),
     gen_server:start_link({local, ?SERVER}, ?MODULE, [Port], []).
 
 broadcast(Msg) ->
@@ -114,7 +114,7 @@ acceptor_init(ListenSocket) ->
             io:format("~w connected.~n", [Socket]),
             gen_server:cast(?SERVER, {add_client, self()}),
             inet:setopts(Socket, ?ACCEPT_OPTS),
-            zen_client:loop({tcp, Socket, waiting_auth});
+            zen_client:loop({tcp_client, Socket, waiting_auth});
         Else ->
             io:format("*** accept returned ~w.", [Else]),
             exit({error, {bad_accept, Else}})

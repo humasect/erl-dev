@@ -4,9 +4,9 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 22 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 23 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(vre_app).
+-module(val_app).
 -author('humasect@gmail.com').
 -behaviour(application).
 
@@ -18,7 +18,7 @@
 %%%===================================================================
 
 start(_StartType, _StartArgs) ->
-    case vre_sup:start_link() of
+    case val_sup:start_link() of
         {ok, Pid} ->
             {ok, Pid};
         Error ->

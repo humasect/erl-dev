@@ -14,16 +14,16 @@
 (defconst lco-game-buffer-name "*lco-game*")
 (defconst lco-splash "VRE client 1.0 ready.\n")
 
-(defun message-buffer ()
+(defun lco-message-buffer ()
   (get-buffer-create "*lco-messages*"))
-(defun game-buffer ()
+(defun lco-game-buffer ()
   (get-buffer-create "*lco-game*"))
 
-(defun log (msg)
+(defun lco-log (msg)
   (with-current-buffer (message-buffer)
   ;;(set-buffer (message-buffer))
   ;;(buffer-end 1)
-    (set-window-point (get-buffer-window (message-buffer)) (point-max))
+    (set-window-point (get-buffer-window (lco-message-buffer)) (point-max))
     (goto-char (point-max))
     (insert msg)))
   ;;(set-buffer (other-buffer)))
@@ -39,83 +39,83 @@
 ;;--------------------------------------------------------------
 
 (defun lco-filter (proc string)
-  (log string)
-  (log (format "json: %s\n" (json-read-from-string string))))
+  (lco-log string)
+  (lco-log (format "json: %s\n" (json-read-from-string string))))
 
 (defun lco-sentinel (proc what)
-  (log what))
+  (lco-log what))
 
-(defun init-net (user pass)
-  (log "Connecting... ")
+(defun lco-init-net (user pass)
+  (lco-log "Connecting... ")
   (setq lco-process (make-network-process
                      :name "lco-client"
                      :type nil
                      :host lco-server
                      :service lco-port
                      :family nil
-                     :buffer (game-buffer)
+                     :buffer (lco-game-buffer)
                      :coding 'utf-8
                      :filter 'lco-filter
                      :sentinel 'lco-sentinel))
   (if lco-process
-      (log "OK.\n")
-    (log "Error.\n")))
+      (lco-log "OK.\n")
+    (lco-log "Error.\n")))
 
 ;;--------------------------------------------------------------
 ;; display / interface
 ;;--------------------------------------------------------------
 
-(defun init-display ()
+(defun lco-init-display ()
   (setq f (make-frame
            '((title . lco-splash)
              (name . "lco-frame")
              (width . 80)
              (height . 50)
-             (buffer-list . '((message-buffer) (game-buffer)))
+             (buffer-list . '((lco-message-buffer) (lco-game-buffer)))
              (unsplittable . t)
              (menu-bar-lines . nil)
              (tool-bar-lines . nil))))
 
   (select-frame f)
-  (switch-to-buffer (message-buffer))
+  (switch-to-buffer (lco-message-buffer))
   ;;(delete-region (point-min) (point-max))
   (setq w2 (split-window (selected-window) 10))
   (select-window w2)
-  (switch-to-buffer (game-buffer))
+  (switch-to-buffer (lco-game-buffer))
   ;;(delete-region (point-min) (point-max))
   )
   ;;(switch-to-buffer (game-buffer)))
 
-(defun movement (angle)
+(defun lco-move (angle)
   (lco-send '(:move angle)))
 
-(defun init-keys ()
+(defun lco-init-keys ()
   (set-buffer (game-buffer))
 
-  (local-set-key "4" (lambda () (interactive) (movement 270)))
-  (local-set-key "2" (lambda () (interactive) (movement 180)))
-  (local-set-key "6" (lambda () (interactive) (movement 90)))
-  (local-set-key "8" (lambda () (interactive) (movement 0)))
+  (local-set-key "4" (lambda () (interactive) (lco-move 270)))
+  (local-set-key "2" (lambda () (interactive) (lco-move 180)))
+  (local-set-key "6" (lambda () (interactive) (lco-move 90)))
+  (local-set-key "8" (lambda () (interactive) (lco-move 0)))
 
-  (local-set-key "7" (lambda () (interactive) (movement 315)))
-  (local-set-key "9" (lambda () (interactive) (movement 45)))
-  (local-set-key "3" (lambda () (interactive) (movement 135)))
-  (local-set-key "1" (lambda () (interactive) (movement 225))))
+  (local-set-key "7" (lambda () (interactive) (lco-move 315)))
+  (local-set-key "9" (lambda () (interactive) (lco-move 45)))
+  (local-set-key "3" (lambda () (interactive) (lco-move 135)))
+  (local-set-key "1" (lambda () (interactive) (lco-move 225))))
 
 ;;--------------------------------------------------------------
 ;; API
 ;;--------------------------------------------------------------
 
 (defun lco-init ()
-  (log (format "\n%s" lco-splash))
-  (init-keys))
+  (lco-log (format "\n%s" lco-splash))
+  (lco-init-keys))
 
 (defun lco (user pass)
   (interactive "sUsername: \nsPassword: ")
-  (init-display)
+  (lco-init-display)
   (lco-init)
 
-  (init-net user pass)
+  (lco-init-net user pass)
   (lco-send `(:client (:login [,user ,pass])))
   )
 
