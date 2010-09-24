@@ -1,3 +1,7 @@
+#+TITLE: /Emacs Stuff/
+
+#+INCLUDE: header.hrg
+
 * Introduction
 
 ** TODO disallow dev login from anywhere except localhost
@@ -16,3 +20,5 @@ Evaluate this into Emacs and type in login name and password:
 (load "zenclient")
 (lco)
 #+END_SRC
+
+#+INCLUDE: footer.hrg

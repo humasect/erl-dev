@@ -1,3 +1,5 @@
+#+INCLUDE: header.hrg
+
 * Tasks
 ** TODO fix something
    
@@ -8,3 +10,6 @@
    
 ** TODO use emacs and inets for code-reload ll().
    use for generate org-html and edoc
+
+* 
+#+INCLUDE: footer.hrg

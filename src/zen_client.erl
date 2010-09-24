@@ -147,9 +147,8 @@ handle_message([{<<"say">>, Text}],
     {ok, Client}
         ;
 handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
-    io:format("game message: ~p~n", [Msg]),
     %%Game = zen_session_sup:which_session(Id),
-    gen_server:call(Game, Msg),
+    gen_server:cast(Game, Msg),
     {ok, Client}
         ;
 handle_message(Msg, State) ->
@@ -160,11 +159,13 @@ handle_message(Msg, State) ->
 %%%===================================================================
 
 closed(Client = #web_client{socket=WS}, Reason) ->
-    io:format("web socket: ~w ~p.~n", [WS:get(socket), Reason]),
+    io:format("web socket: ~w ~w ~p.~n",
+              [ip_address(web_client,WS), WS:get(socket), Reason]),
     close_client(Client)
         ;
 closed(Client = #tcp_client{socket=S}, Reason) ->     
-    io:format("tcp socket: ~w ~p.~n", [S, Reason]),
+    io:format("tcp socket: ~w ~w ~p.~n",
+              [ip_address(tcp_client,S), S, Reason]),
     close_client(Client).
 
 send_raw(#web_client{socket=WS}, Data) ->
@@ -174,7 +175,6 @@ send_raw(#tcp_client{socket=S}, Data) ->
     gen_tcp:send(S, Data).
 
 send(Client, Object) ->
-    io:format("aoeuaoeu ~p~n", [Object]),
     send_raw(Client, [jsx:term_to_json(Object), $\n]).
 
 ip_address(web_client, WS) ->

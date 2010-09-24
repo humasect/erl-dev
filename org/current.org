@@ -2,6 +2,8 @@
 
 #+OPTIONS: ^:{}
 
+#+INCLUDE: header.hrg
+
 ** TODO zen_tcp:broadcaost to everyone, but zen_tcp:status_broadcast to status.
 ** TODO print IP address
 ** TODO logging!
@@ -57,3 +59,6 @@
 
    {error,{badrecord,user},{bad_user_record,{"test","developer"}}}
 #+END_SRC
+
+* 
+#+INCLUDE: footer.hrg

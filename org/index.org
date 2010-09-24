@@ -1,11 +1,14 @@
-#+TITLE: /The Zen Social Adventure Game Server/
+#+TITLE: /Erlang Development/
 
-#  + INFOJS_OPT: view:info toc:nil path:org-info.js
+#+OPTIONS: num:nil toc:nil ^:{}
 
-#+OPTIONS: toc:nil 
+-----
 
-[[/game/][New Valhalla Web Client]]
+[[/dev/zen/][Zen Server Server]]
 
-[[/][Old Valhalla Web Client]]
+[[/dev/vre/][VREnvironment Server]]
 
-#+INCLUDE: "footer.hrg"
+[[/dev/val/][Valhalla Server]]
+
+* 
+#+INCLUDE: footer.hrg

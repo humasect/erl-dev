@@ -1,7 +1,10 @@
 #+TITLE: /VREnvironment Server/
 
+#+INCLUDE: ../header.hrg
+
 * General
 
 * Nothing Else.
 
-#+INCLUDE: footer.hrg
+* 
+#+INCLUDE: ../footer.hrg

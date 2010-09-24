@@ -1,0 +1,12 @@
+#+TITLE: /Gamelike/
+
+* Overview
+
+One is able to make their own game; this is how flexible is the
+dynamic nature of each game session.
+
+Any screen/circumstance should be sufficient to decide the next move,
+previous knowledge of what happened in passed/past turns is not required.
+Pick up/put down..
+
+#+INCLUDE: "footer.hrg"

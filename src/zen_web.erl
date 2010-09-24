@@ -84,11 +84,10 @@ user_group(Login) ->
 config({auth_dir,Name}) ->
     {Realm,Groups} =
         case Name of
-            "edoc"  -> {"Zen Edoc",   [dev, admin, vendor]};
-            "dev"   -> {"Zen Dev",    [dev, admin, vendor]};
-            "game"  -> {"Gamelike",   [dev, admin, player]};
-            "stats" -> {"Game Stats", [dev, admin, player]};
-            _       -> {"Zen", [dev]}
+            "dev"     -> {"Zen Dev",    [dev, vendor]};
+            "game"    -> {"Gamelike",   [dev, admin, player]};
+            "stats"   -> {"Game Stats", [dev, admin, player]};
+            _         -> {"Zen", [dev]}
         end,
     {?webconf(root) ++ "/" ++ Name ++ "/",
      [{auth_name,Realm},
@@ -97,7 +96,9 @@ config({auth_dir,Name}) ->
       {require_group, Groups}]}
         ;
 config(root) ->
-    zen_app:priv_dir("www")
+    {ok,Cwd} = file:get_cwd(),
+    filename:join(Cwd, "htdocs")
+    %%zen_app:priv_dir("www")
         ;
 config(inets) ->
     {ok,Hostname} = inet:gethostname(),
@@ -121,7 +122,6 @@ config(inets) ->
 
      {directory, ?webconf({auth_dir, "game"})},
      {directory, ?webconf({auth_dir, "stats"})},
-     {directory, ?webconf({auth_dir, "edoc"})},
      {directory, ?webconf({auth_dir, "dev"})},
 
      {modules, [zen_mod_websocket,

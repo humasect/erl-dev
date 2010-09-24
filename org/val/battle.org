@@ -1,0 +1,9 @@
+#+TITLE: /Gamelike Battle/
+
+#+INCLUDE: ../header.hrg
+
+* バトル
+** 全てのdice rollはパーセント
+
+* 
+#+INCLUDE: ../footer.hrg

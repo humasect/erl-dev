@@ -1,5 +1,7 @@
 #+TITLE: /Gamelike Prototype/
 
+#+INCLUDE: header.hrg
+
 The prototype offline application runs on Mac OS X and iPhone and iPad.
 It was built in one month using:
 
@@ -25,3 +27,6 @@ It was built in one month using:
 
 [[20100705100036.png]]
 [[20100720191411.png]]
+
+* 
+#+INCLUDE: footer.hrg

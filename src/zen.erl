@@ -10,7 +10,8 @@
 -author('humasect@gmail.com').
 
 %% API
--export([start_all/0, stop_all/0, init_db/0]).
+-export([start_all/0, stop_all/0,
+         init_db/0, make_all_docs/0]).
 -export([create_account/4,
          remove_account/1,
          list_accounts/0]).
@@ -34,6 +35,9 @@ stop_all() ->
     zen_web:stop(),
     inets:stop(),
     mnesia:stop().
+
+make_all_docs() ->
+    lists:foreach(fun user_default:mkdoc/1, [zen, vre, val]).
 
 -spec create_account(string(), string(), string(), user_group()) ->
                             ok | {error, term()}.

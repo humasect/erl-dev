@@ -1,0 +1,15 @@
+#+TITLE: /Gamelike Character/
+
+#+INCLUDE: ../header.hrg
+
+* キャラクチャー
+** 女／男／neutral gender alignmentシステム
+   Calculated by how the player plays.
+** remember stuff across game sessions
+   新しいのクエストとダンジョンを表れる、それとアイテムとアビリティ。
+   Opening new quests and dungeons, items or abilities or other rewards.
+** TODO ステータス hp/sp exp/jexp
+** どうする変化した？モンスターに。
+
+* 
+#+INCLUDE: ../footer.hrg

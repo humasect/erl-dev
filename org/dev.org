@@ -2,6 +2,8 @@
 
 #+OPTIONS: ^:{}
 
+#+INCLUDE: header.hrg
+
 始めの発動で`erl-dev.sh'を行動する。それから入力し:
 #+BEGIN_SRC erlang
 zen:start_all().
@@ -36,4 +38,5 @@ zen:start_all().
    CLOSED: [2010-09-16 Thu 15:39]
    http://github.com/humasect/themiddle
 
-
+* 
+#+INCLUDE: footer.hrg

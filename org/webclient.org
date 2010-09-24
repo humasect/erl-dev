@@ -1,5 +1,7 @@
 #+TITLE: /Web Client/
 
+#+INCLUDE: header.hrg
+
 * Introduction
 
 See also [[file:valhalla][Valhalla Server]].
@@ -27,6 +29,6 @@ See also [[file:valhalla][Valhalla Server]].
 *** TODO weapon swing and shine slash effect
 *** TODO menu sheets (inventory, profile, map)
 
-
-#+INCLUDE: "footer.hrg"
+* 
+#+INCLUDE: footer.hrg
 

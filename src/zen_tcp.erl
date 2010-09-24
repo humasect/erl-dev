@@ -67,8 +67,6 @@ broadcast(Msg) ->
 init([Port]) ->
     case gen_tcp:listen(Port, ?LISTEN_OPTS) of
         {ok,ListenSocket} ->
-            %% log here
-            io:format("got socket...~n"),
             {ok, {ListenSocket, ?spawn_acceptor, []}};
         Error ->
             exit(Error)
@@ -90,16 +88,13 @@ handle_cast({add_client, Pid}, {ListenSocket,Acceptor,Clients}) ->
         ;
 handle_cast({broadcast, Msg}, State = {_, _, Clients}) ->
     io:format("~w clients.~n", [length(Clients)]),
-    lists:foreach(fun(C) -> C ! {send, Msg} end, Clients),
+    lists:foreach(fun(C) -> C ! {send,Msg} end, Clients),
     {noreply, State}.
 
 handle_info({'DOWN', _Ref, process, Pid2, Reason}, {LS,Acceptor,Clients}) ->
     NewClients = lists:delete(Pid2, Clients),
-    io:format("client died: ~p~n", [Reason]),
+    %%io:format("client died: ~p~n", [Reason]),
     {noreply, {LS, Acceptor, NewClients}}.
-%% handle_info({'EXIT', _Pid, Reason}, {LS,_,Clients}) ->
-%%     io:format("acceptor died! ~p~n", [Reason]),
-%%     {noreply, {LS, ?spawn_acceptor, Clients}}.
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
@@ -111,7 +106,8 @@ code_change(_OldVsn, State, _Extra) ->
 acceptor_init(ListenSocket) ->
     case gen_tcp:accept(ListenSocket) of
         {ok,Socket} ->
-            io:format("~w connected.~n", [Socket]),
+            {ok,{Address,_Port}} = inet:peername(Socket), % same in zen_client
+            io:format("~w connected.~n", [Address]),
             gen_server:cast(?SERVER, {add_client, self()}),
             inet:setopts(Socket, ?ACCEPT_OPTS),
             zen_client:loop({tcp_client, Socket, waiting_auth});

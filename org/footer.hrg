@@ -3,14 +3,14 @@
 -----
 
 #+BEGIN_CENTER
-[[file:index.org][Index]] | [[file:sitemap.org][Developer Documentation]] | [[/edoc/][Source Code Module Reference]]
+[[/dev/][Developer Home]] | [[file:/dev/sitemap.org][Site Map]]
 #+END_CENTER
 
 -----
 
 #+BEGIN_HTML
 <p align="right">
-  <i>&copy;2010 <a href="humasect@gmail.com">humasect</a></i>
+  <i>&copy;2010 <a href="humasect@gmail.com">Lyndon Tremblay</a></i>
   &nbsp;&nbsp;
 </p>
 #+END_HTML

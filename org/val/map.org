@@ -1,0 +1,13 @@
+#+TITLE: /Gamelike Map/
+
+#+INCLUDE: ../header.hrg
+
+* マップ
+** マップは、 画面なサイズのセルで作り出す。
+   Configurable scrolling
+** TODO 世界の地図
+** TODO ダンジョンをジェネレート
+** TODO タイルをジェネレート
+
+* 
+#+INCLUDE: ../footer.hrg

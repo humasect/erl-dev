@@ -1,13 +1,20 @@
 #+TITLE: /Site Map/
 
-   + [[file:current.org][/Current Work/]]
-   + [[file:dev.org][/Development Notes/]]
-   + [[file:gamelike-proto.org][/Gamelike Prototype/]]
-   + [[file:gamelike.org][/Gamelike/]]
-   + [[file:index.org][/The Zen Social Adventure Game Server/]]
-   + [[file:vrenvironment.org][/VREnvironment Server/]]
-   + [[file:valhalla.org][/Valhalla Game Server/]]
+   + zen
+     + [[file:zen/index.org][/Zen Server/]]
+   + vre
+     + [[file:vre/index.org][/VREnvironment Server/]]
+   + val
+     + [[file:val/overview.org][/Gamelike/]]
+     + [[file:val/map.org][/Gamelike Map/]]
+     + [[file:val/index.org][/Valhalla Game Server/]]
+     + [[file:val/character.org][/Gamelike Character/]]
+     + [[file:val/battle.org][/Gamelike Battle/]]
    + [[file:webclient.org][/Web Client/]]
-   + [[file:quickstart.org][/Zen Server Quick Start/]]
-   + [[file:emacs.org][emacs]]
+   + [[file:quickstart.org][/Quick Start/]]
+   + [[file:prototype.org][/Gamelike Prototype/]]
    + [[file:notes.org][notes]]
+   + [[file:index.org][/Erlang Development/]]
+   + [[file:emacs.org][/Emacs Stuff/]]
+   + [[file:dev.org][/Development Notes/]]
+   + [[file:current.org][/Current Work/]]
