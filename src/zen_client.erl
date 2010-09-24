@@ -54,8 +54,9 @@ loop(Client = #tcp_client{socket=Socket}) ->
             closed(Client, timeout)
     end.
 
-close_client({SockType, Socket, #in_game{id=Id, module=Mod}}) ->
-    Mod:client_stop(Id),
+close_client({SockType, Socket, #in_game{id=Id}}) ->
+    io:format("close game ~p~n", [Id]),
+    zen_session_sup:stop_session(Id),
     {SockType, Socket, closed}
         ;
 close_client({SockType, Socket, _}) ->
@@ -132,7 +133,7 @@ handle_message([{<<"login">>, Creds}],
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
             %%Text = zen_data:get_text(Lang, Else),
-            send(Client, [{result, [{error, Else}]}]),
+            send(Client, [{result, [{error, atom_to_binary(Else,latin1)}]}]),
             {error, Else, Auth}
     end
         ;

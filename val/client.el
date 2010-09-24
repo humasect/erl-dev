@@ -87,10 +87,16 @@
   ;;(switch-to-buffer (game-buffer)))
 
 (defun lco-move (angle)
-  (lco-send '(:move angle)))
+  (lco-send `(:client (:move ,angle))))
 
 (defun lco-init-keys ()
   (set-buffer (game-buffer))
+
+  (local-set-key "/" (lambda (cmd)
+                       (interactive "sCommand: ")
+                       (lco-send `(:client (:command ,cmd)))))
+
+  (local-set-key "q" 'lco-quit)
 
   (local-set-key "4" (lambda () (interactive) (lco-move 270)))
   (local-set-key "2" (lambda () (interactive) (lco-move 180)))
