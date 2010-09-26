@@ -1,0 +1,6 @@
+# -*- org -*-
+
+#+OPTIONS: ^:{}
+
+#+MACRO: line-table #+ATTR_HTML: border="1" rules="all" frame="all"
+

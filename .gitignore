@@ -1,9 +1,8 @@
 *.beam
 user_default.erl
 log/*
-zen/priv/log/*
-zen/priv/www/edoc
-zen/priv/www/dev
+htdocs/log/*
+htdocs/dev/*
 .DS_Store
 
 oldsrc

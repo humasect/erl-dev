@@ -84,7 +84,8 @@ user_group(Login) ->
 config({auth_dir,Name}) ->
     {Realm,Groups} =
         case Name of
-            "dev"     -> {"Zen Dev",    [dev, vendor]};
+            %% extra groups: rgrd, emacs
+            "dev"     -> {"Zen Dev",    [dev, rgrd, vendor]};
             "game"    -> {"Gamelike",   [dev, admin, player]};
             "stats"   -> {"Game Stats", [dev, admin, player]};
             _         -> {"Zen", [dev]}

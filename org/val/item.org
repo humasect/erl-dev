@@ -1,0 +1,129 @@
+#+TITLE: /Gamelike Item/
+
+#+INCLUDE: ../header.hrg
+#+SETUPFILE: ../setup.hrg
+
+* All Items
+  Item actions listed here are 1 turn.
+
+** Actions
+   + An item has a chance to break if it is thrown and hits an actor.
+   + Two items cannot be on the same part of floor.
+
+{{{line-table}}}
+| Action  | Effect                                    | State                |
+|---------+-------------------------------------------+----------------------|
+| Throw   | /Throw the item in the facing directionl/ |                      |
+| Drop    | /Put item on the ground/                  | if no item on ground |
+| Explain | /Display description screen for item/     |                      |
+
+** Properties
+   - Items share some common properties
+
+{{{line-table}}}
+| Property       | Use                              | Type                  |
+|----------------+----------------------------------+-----------------------|
+| amount/charges | /How many charges left in item/  | pos_integer           |
+| status         | /The status of the item/         | blessed,cursed,normal |
+| cost           | /The full price in zeny at 饕/   | uinteger              |
+| charge_cost    | /The price for each item charge/ | uinteger              |
+| weight         | /The weight of the item/         | uinteger              |
+|                |                                  |                       |
+
+** Status
+*** 熱中及失奶氾丞
+    Cannot be taken off if worn.
+    Cannot be used unless already equipped.
+*** 誼吽及失奶氾丞
+    Extra damage.
+    Does not become destroyed when used, but has a change to become unblessed when used
+
+* Consumables
+** Herbs
+   - Herbs can be eaten or thrown to an actor to cause the effect.
+   - Eating a herb replenishes 5% fullness.
+
+{{{line-table}}}
+| Name                | Effect           | Note |
+|---------------------+------------------+------|
+| Weak Healing Herb   | Replenish 6% HP  |      |
+| Healing Herb        | Replenish 12% HP |      |
+| Strong Healing Herb | Replenish 24% HP |      |
+
+** Food
+   - Food is used to replenish SP and sometimes HP.
+
+{{{line-table}}}
+| Name       | Effect        | Note                        |
+|------------+---------------+-----------------------------|
+| Cherry     | 5% SP         | Stacking item (cherry[ 3 ]) |
+| Strawberry | 5% SP         | Stacking                    |
+| Grape      | 5% SP         | Stacking                    |
+| Apple      | 25% SP        |                             |
+| Orange     | 50% SP        |                             |
+| Lemon      | 50% SP        |                             |
+| Peach      | 50% SP        |                             |
+| Banana     | 25% SP 25% HP | Changes to 'Banana Peel'    |
+| Avocado    | 25% SP 25% HP |                             |
+| Coconut    | 25% SP 25% HP |                             |
+| Mango      | 50% SP 25% HP |                             |
+
+** Potions
+   - Potion can be mixed
+
+{{{line-table}}}
+| Name         | Effect                                    | Note                           |
+|--------------+-------------------------------------------+--------------------------------|
+| Empty Bottle | None                                      | Can be used to collect liquids |
+| Alcohol      | Confusion and Provoke state when consumed |                                |
+| Water        | None                                      |                                |
+| Poison       | Poison effect                             |                                |
+
+* Bags
+** Bag of Holding
+    - Used for holding other items except bags.
+
+{{{line-table}}}
+| Action   | Effect                             | State                |
+|----------+------------------------------------+----------------------|
+| Contents | /Look inside, show inventory menu/ |                      |
+| Put In   | /Request an item to be entered/    | when there are slots |
+
+* Scrolls
+  - Scrolls are single-charge items
+
+{{{line-table}}}
+| Name            | Effect                                         | Note              |
+|-----------------+------------------------------------------------+-------------------|
+| Teleport Scroll | Warp user to random unoccupied location of map |                   |
+| Blank Scroll    | Takes the effect of what is written            | Write Name action |
+|                 |                                                |                   |
+
+* Staffs
+  - Holds charges. Swing to fire a charge in direction of facing.
+  - A staff can be thrown for the effect if it hits, even when there are no charges.
+
+{{{line-table}}}
+| Name           | Effect                                           | Note          |
+|----------------+--------------------------------------------------+---------------|
+| Transfer Staff | Swap places with the actor the shot hits, if any |               |
+| 紹及橡      | A fire element shot for MATK*1.25                | Fire element  |
+| 踹及橡      | A water element shot for MATK*1.25               | Water element |
+
+* Equipment
+** Weapons
+   Can be equipped to left or right hand.
+** Armor
+   Can be equipped to left or right hand.
+** Accessories
+   Can be equipped to one of two accessory slots.
+   - Hats
+   - Armbands
+   - Rings
+   - Necklace
+   - Shoes
+** Ammunition
+   Arrows, knives, rocks, traps
+
+#+INCLUDE: ../footer.hrg
+

@@ -47,6 +47,8 @@ loop(Client = #tcp_client{socket=Socket}) ->
         {send,Object} ->
             send(Client, Object),
             ?MODULE:loop(Client);
+       %% {'DOWN', Ref, process, Pid2, Reason} ->
+        %    closed(
         Else ->
             closed(Client, Else)
     after
@@ -54,9 +56,11 @@ loop(Client = #tcp_client{socket=Socket}) ->
             closed(Client, timeout)
     end.
 
-close_client({SockType, Socket, #in_game{id=Id}}) ->
+close_client({SockType, Socket, #in_game{id=Id, game_pid=Game}}) ->
     io:format("close game ~p~n", [Id]),
     zen_session_sup:stop_session(Id),
+    %%erlang:demonitor(Game),
+    unlink(Game),
     {SockType, Socket, closed}
         ;
 close_client({SockType, Socket, _}) ->
@@ -83,6 +87,10 @@ is_playing(Id) ->
         _ -> true
     end.
 
+authorize(Auth = {"dev", "dev", {127,0,0,1}, _Mod}) ->
+    authorize(Auth);
+authorize({"dev", "dev", _Ip, _Mod}) ->
+    {error,bad_credentials};
 authorize({Login, Password, Ip, _Mod}) ->
     F = fun() ->
                 case mnesia:match_object(#account{login=Login,
@@ -111,7 +119,7 @@ handle_message([{<<"login">>, Creds}],
                Client = {SockType, Socket, waiting_auth}) ->
     {Mod,Login,Password,_Language} =
         case Creds of
-            [User,Pass] -> {vre_game,User,Pass,english};
+            [User,Pass] -> {vre_user,User,Pass,english};
             [User,Pass,Lang] -> {val_game,User,Pass,Lang}
         end,
     Auth = {binary_to_list(Login),
@@ -122,6 +130,8 @@ handle_message([{<<"login">>, Creds}],
         {ok,Group,Id,Name} ->
             io:format("log in: ~p~n", [Auth]),
             Game = zen_session_sup:start_session(Id, Mod),
+            link(Game),
+            %%erlang:monitor(Game),
             send(Client, [{result,
                            [{ok,
                              [atom_to_binary(Group, latin1),

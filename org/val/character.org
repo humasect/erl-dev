@@ -1,6 +1,19 @@
 #+TITLE: /Gamelike Character/
 
 #+INCLUDE: ../header.hrg
+#+SETUPFILE: ../setup.hrg
+
+#+STYLE: <link rel="stylesheet" type="text/css" href="style.css"/>
+
+* Actors
+
+* Status Effects
+
+{{{line-table}}}
+| Type   | Effect                  | Note |
+|--------+-------------------------+------|
+| Poison | Loss of HP at each turn |      |
+| Mute   | Cannot use skills       |      |
 
 * キャラクチャー
 ** 女／男／neutral gender alignmentシステム

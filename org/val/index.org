@@ -1,36 +1,29 @@
-#+TITLE: /Valhalla Game Server/
-
-#+OPTIONS: ^:{}
-
-#+INCLUDE: ../header.hrg
+#+TITLE: /Gamelike/
 
 * Overview
 
- - actors have either 1) a client+socket PID, 2) an AI PID. 
- - has several kind of connections: http restful, tcp socket, web socket.
- - has several interfaces: irc, web, telnet, desktop client, emacs.
+  One is able to make their own game; this is how flexible is the
+  dynamic nature of each game session.
 
-* Developer Notes
+  Any screen/circumstance should be sufficient to decide the next move,
+  previous knowledge of what happened in passed/past turns is not required.
+  Pick up/put down..
+  
+* Subsections
 
- - should be ONE(1) mnesia transaction for each turn for each world...
+  [[file:battle.org][Battle System]]
+  
+  [[file:item.org][Items]]
+  
+  [[file:character.org][Character Evolution and Stats]]
+  
+  [[file:map.org][Map and Room System]]
 
-* Tasks
+  [[file:server.org][Server Information]]
 
-** Generating
+* Inspirational Game Links
 
-*** TODO [re]use seed {A,B,C}
-*** TODO edit/parse svg files with server side include?
+  Cladun! nippon ichi
+  http://www.youtube.com/watch?v=eKkrYLMOAHE
 
-** Network
-
-*** TODO restful api with login/out
-*** TODO implement ('val_tcp') websockets
-    [[http://armstrongonsoftware.blogspot.com/2009/12/comet-is-dead-long-live-websockets.html]]
-
-** Turns
-
-*** TODO database cycle
-    open (read) transaction -> apply turn -> close (write) transaction
-
-* 
 #+INCLUDE: ../footer.hrg

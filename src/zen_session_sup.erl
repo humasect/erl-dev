@@ -13,7 +13,7 @@
 %% API
 -export([start_link/0]).
 -export([start_session/2, stop_session/1]).
--export([which_session/1, all_sessions/0]).
+-export([which_session/1, all_sessions/0, kill_all_sessions/0]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -50,8 +50,11 @@ which_session(Name) ->
         _ -> undefined
     end.
 
+kill_all_sessions() ->
+    lists:foreach(fun stop_session/1, all_sessions()).
+
 all_sessions() ->
-    [C || {_,C,_,_} <- supervisor:which_children(?SERVER)].
+    [Id || {Id,_,_,_} <- supervisor:which_children(?SERVER)].
 
 %%%===================================================================
 %%% Supervisor callbacks

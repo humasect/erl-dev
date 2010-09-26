@@ -2,8 +2,20 @@
 
 #+INCLUDE: ../header.hrg
 
-* バトル
-** 全てのdice rollはパーセント
+* Overview
+  - Any undefined attack or heal is the amount ``1''.
+    - hmm
+- 全てのdice rollはパーセント
+
+* Attack
+  One turn uses two hands. Two swords is two attacks, Two shields is two defends.
+  Sword then shield is attack then defend, shield then sword is defend then attack.
+
+  Damage = (Item VAL * Dest STR) / Target DEF
+
+* Defense
+
+  Damage = (Item VAL * Source STR) / Dest DEF
 
 * 
 #+INCLUDE: ../footer.hrg
