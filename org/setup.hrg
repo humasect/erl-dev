@@ -2,5 +2,12 @@
 
 #+OPTIONS: ^:{}
 
-#+MACRO: line-table #+ATTR_HTML: border="1" rules="all" frame="all"
+# 
+#   this is done in export.el
+#
+#     + S T Y L E : 
+#    <link rel="stylesheet" type="text/css" href="/docstyle.css"/>
+#
+
+#+MACRO: line-table #+ATTR_HTML: border="2" rules="all" frame="all"
 

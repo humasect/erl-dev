@@ -18,7 +18,25 @@
    :auto-sitemap t
    :sitemap-title "/Site Map/"
    :sitemap-alphabetically nil
+   ;; :xml-declaration nil
    :recursive t
+
+    ;;:style "<link rel=\"stylesheet\"
+    ;;         type=\"text/css\" href=\"/docstyle.css\"/>"
+   :style "<style type=\"text/css\">
+html {
+background: #555555;
+color: #ffffff;
+}
+a:link { color: orange; }
+a:visited { color: #aa6500; }
+table { border-color: white; }
+</style>"
+   ;; :style "<style type=\"text/css\" media=\"screen\">
+;; @import \"/docstyle.css\";
+;; </style>"
+   :style-include-default t
+
    :headline-levels 4
    :auto-preamble t))
 
@@ -66,5 +84,6 @@
 
 (setq org-default-notes-file (concat erl-root "/org/notes.org"))
 (define-key global-map (kbd "C-c c") 'org-capture)
+(add-to-list 'org-export-html-inline-image-extensions "svg")
 
 (global-set-key (kbd "s-o") 'erl-publish)

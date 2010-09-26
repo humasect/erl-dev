@@ -3,8 +3,6 @@
 #+INCLUDE: ../header.hrg
 #+SETUPFILE: ../setup.hrg
 
-#+STYLE: <link rel="stylesheet" type="text/css" href="style.css"/>
-
 * Actors
 
 * Status Effects

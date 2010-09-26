@@ -1,4 +1,4 @@
-#+TITLE: /Gamelike Item/
+#+TITLE: /Gamelike Items/
 
 #+INCLUDE: ../header.hrg
 #+SETUPFILE: ../setup.hrg
@@ -69,6 +69,7 @@
 | Mango      | 50% SP 25% HP |                             |
 
 ** Potions
+   [[/val/potion.svg]]
    - Potion can be mixed
 
 {{{line-table}}}
