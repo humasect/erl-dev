@@ -1,0 +1,87 @@
+#+TITLE: /Gamelike World/
+
+#+SETUPFILE: ../setup.hrg
+
+* Humble Town
+  The hub town of the world which beginning players start and where veteran players respawn.
+** Layman's Dungeon
+   - The place where a beginning player will start to learn the game
+   - Existing players can return here to gain some levels on respawn.
+** Shop
+   - Buy items.
+   - Sell items.
+   - Tag items.
+   - Untag items.
+   - Retrieve tagged items.
+** Storage
+   - Holds up to 80 items, organized by type. See [[file:item.org]].
+   - Give item
+   - Take item
+   - Give all items
+** Smith
+   - Upgrade items.
+   - Combine items.
+   - Deconstruct items into materials.
+   - Construct items from materials.
+** Fortune Teller (better name)
+   - Skills.
+   - Jobs.
+
+* Dungeons
+  - Dungeons are like entering a portal to a parallel realm or dream world.
+
+** The Middle Areas
+
+*** Field of Patience
+    - Movement
+    - 3 floors
+*** Circle Cave
+    - Stillness
+    - 3 floors
+*** Revolving Tower
+    - Movement
+    - 5 floors
+*** Castle of the In-Between
+    - Stillness
+    - 5 floors
+    - Completion opens Heaven areas and Hell areas
+
+** Heaven Continent Areas
+
+*** Lake of Reflections
+*** Cave of Harmony
+*** Field of Compassion and Equanimity
+*** Joy and Happiness Plateau
+    - Buddha resides here.
+
+** Hell Continent Areas
+
+*** Nightmare Island
+    The entrance to Hell.
+*** Sea of Tears
+*** Labyrinth of Delirium
+*** Maze of Horrors
+*** Tower of Lost Souls
+    - Mara resides here.
+
+* Special Characters
+
+** Player
+   A homeless wanderer with no posessions.
+   - Alignment varies by play
+
+** Spirit of Phenomena, Spirit of Nature, Spirit of Life and Death
+   - Neutral alignment
+   - Appears in deer form during the day
+   - Appears in formless spirit during the night
+   [[keiths.png]] [[mononoke1.png]] [[mononoke2.png]] [[mononoke3.png]] [[mononoke4.png]]
+
+** God of Entropy
+
+** Mara
+   - Strong Chaotic alignment
+
+** Buhhda
+   - Strong Lawful alignment
+
+#+INCLUDE: ../footer.hrg

@@ -5,8 +5,8 @@
    + vre
      + [[file:vre/index.org][/VREnvironment Server/]]
    + val
+     + [[file:val/world.org][/Gamelike World/]]
      + [[file:val/server.org][/Valhalla Game Server/]]
-     + [[file:val/map.org][/Gamelike Map/]]
      + [[file:val/item.org][/Gamelike Item/]]
      + [[file:val/index.org][/Valhalla Game Server/]]
      + [[file:val/character.org][/Gamelike Character/]]

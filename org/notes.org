@@ -1,3 +1,6 @@
+#+TITLE: /Development Notes/
+
+#+SETUPFILE: setup.hrg
 #+INCLUDE: header.hrg
 
 * Tasks
@@ -9,7 +12,10 @@
    http://orgmode.org/worg/org-contrib/org-protocol.php
    
 ** TODO use emacs and inets for code-reload ll().
-   use for generate org-html and edoc
+   - use for generate org-html and edoc
+
+** TODO move game related *.db files from zen/priv to val/priv
+   - probably cleaning up zen_data in the mean time.
 
 * 
 #+INCLUDE: footer.hrg

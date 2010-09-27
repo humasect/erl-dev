@@ -1,6 +1,6 @@
 #+TITLE: /Gamelike Battle/
 
-#+INCLUDE: ../header.hrg
+#+SETUPFILE: ../setup.hrg
 
 * Overview
   - Any undefined attack or heal is the amount ``1''.

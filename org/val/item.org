@@ -1,7 +1,7 @@
 #+TITLE: /Gamelike Items/
 
-#+INCLUDE: ../header.hrg
 #+SETUPFILE: ../setup.hrg
+#+INCLUDE: ../header.hrg
 
 * All Items
   Item actions listed here are 1 turn.
@@ -69,7 +69,7 @@
 | Mango      | 50% SP 25% HP |                             |
 
 ** Potions
-   [[/val/potion.svg]]
+   [[/val/potion2.svg]]
    - Potion can be mixed
 
 {{{line-table}}}

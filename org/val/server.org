@@ -16,21 +16,24 @@
 
 * Tasks
 
-** Generating
+** Maps
+*** マップは、 画面なサイズのセルで作り出す。
+   Configurable scrolling
+*** TODO 世界の地図
+*** TODO ダンジョンをジェネレート
+*** TODO タイルをジェネレート
 
+** Generating
 *** TODO [re]use seed {A,B,C}
 *** TODO edit/parse svg files with server side include?
 
 ** Network
-
 *** TODO restful api with login/out
 *** TODO implement ('val_tcp') websockets
     [[http://armstrongonsoftware.blogspot.com/2009/12/comet-is-dead-long-live-websockets.html]]
 
 ** Turns
-
 *** TODO database cycle
     open (read) transaction -> apply turn -> close (write) transaction
 
-* 
 #+INCLUDE: ../footer.hrg

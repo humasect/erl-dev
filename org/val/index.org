@@ -1,5 +1,8 @@
 #+TITLE: /Gamelike/
 
+#+SETUPFILE: ../setup.hrg
+#+INCLUDE: ../header.hrg
+
 * Overview
 
   One is able to make their own game; this is how flexible is the
@@ -8,19 +11,22 @@
   Any screen/circumstance should be sufficient to decide the next move,
   previous knowledge of what happened in passed/past turns is not required.
   Pick up/put down..
-  
-* Subsections
 
-  [[file:battle.org][Battle System]]
+  [[file:world.org][Gamelike World]]
+
+* Game System
+  [[file:battle.org][Battle System]]  
   
+** Actors
   [[file:item.org][Items]]
-  
-  [[file:character.org][Character Evolution and Stats]]
-  
+
+  [[file:character.org][Characters]]
+
+* Server
   [[file:map.org][Map and Room System]]
 
-  [[file:server.org][Server Information]]
-
+  [[file:server.org][Valhalla Server]]
+  
 * Inspirational Game Links
 
   Cladun! nippon ichi

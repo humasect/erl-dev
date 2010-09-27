@@ -3,15 +3,37 @@
 #+INCLUDE: ../header.hrg
 #+SETUPFILE: ../setup.hrg
 
-* Actors
+* Alignment
+  - Karma(chaotic)
+  - Dharma(lawful)
+
+* Jobs
+  - Player can select a profession to specialise in weapons and skills and game outcome.
+| Job       | Tag | Element | Equip Weapon | Item Weapon | Bonuses      |
+|-----------+-----+---------+--------------+-------------+--------------|
+| Ninja     | N   | Metal   | Sword        | Knife       | AGI+5 STR+10 |
+| Magician  | M   | Earth   | Staff        | Gem         | DEX+5 INT+10 |
+| Hunter    | H   | Wood    | Bow          | Trap        | LUK+5 DEX+10 |
+| Alchemist | A   | Fire    | Gun          | Tool        | INT+5 LUX+10 |
+| Monk/Sage | *   | Void    | N/A          | N/A         | STR+5 AGI+10 |
+
+* Profile
+| Name | Use                 | Note |
+|------+---------------------+------|
+| STR  | Physical ATK and HP |      |
+| INT  | Fromless ATK and SP |      |
+| AGI  |                     |      |
 
 * Status Effects
 
 {{{line-table}}}
-| Type   | Effect                  | Note |
-|--------+-------------------------+------|
-| Poison | Loss of HP at each turn |      |
-| Mute   | Cannot use skills       |      |
+| Type      | Effect                                       | Note | Duration |
+|-----------+----------------------------------------------+------+----------|
+| Poison    | Loss of HP at each turn                      |      | 20 turns |
+| Mute      | Cannot use skills                            |      | 20 turns |
+| Confused  | Walk and Attack direction are random         |      | 20 turns |
+| Paralyze  | Automatic 'Wait' action taken                |      | 20 turns |
+| Blindness | Lose map, item, char location. Gain hearing. |      | ?        |
 
 * キャラクチャー
 ** 女／男／neutral gender alignmentシステム
@@ -22,5 +44,5 @@
 ** TODO ステータス hp/sp exp/jexp
 ** どうする変化した？モンスターに。
 
-* 
+
 #+INCLUDE: ../footer.hrg
