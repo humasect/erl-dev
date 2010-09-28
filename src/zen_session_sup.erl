@@ -29,7 +29,7 @@ start_link() ->
 
 start_session(Id, Module) ->
     Spec = {Id, {Module, start_link, [Id]},
-            permanent, 2000, worker, [Module]},
+            temporary, 2000, worker, [Module]},
     case supervisor:start_child(?SERVER, Spec) of
         {ok,Child} -> Child;
         {ok,Child,_} -> Child;
@@ -48,7 +48,6 @@ stop_session(Id) ->
 
 which_session(Name) ->
     L = [C || {Id,C,_,_} <- supervisor:which_children(?SERVER), Id == Name],
-    io:format("yyyyyyyyyy ~p~n", [L]),
     case L of
         [Head] -> Head;
         _Else -> undefined

@@ -56,16 +56,6 @@ loop(Client = #tcp_client{socket=Socket}) ->
             closed(Client, timeout)
     end.
 
-close_client({SockType, Socket, #in_game{id=Id, game_pid=Game}}) ->
-    io:format("close game ~p~n", [Id]),
-    zen_session_sup:stop_session(Id),
-    %%erlang:demonitor(Game),
-    unlink(Game),
-    {SockType, Socket, closed}
-        ;
-close_client({SockType, Socket, _}) ->
-    {SockType, Socket, closed}.
-
 %%%===================================================================
 %%% messaging
 %%%===================================================================
@@ -86,6 +76,7 @@ process_data(Data, Client) ->
     end.
 
 handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
+    %% @todo only if user is 'dev', evaluate erlang.
     io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
     {ok, Client}
         ;
@@ -98,11 +89,25 @@ handle_message([{<<"client">>, [{<<"say">>, Text}]}],
 handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
     %%Game = zen_session_sup:which_session(Id),
     case gen_server:call(Game, Msg) of
-        ok -> {ok, Client};
-        Else ->
-            send(Client, [{error, atom_to_binary(Else, latin1)}]),
-            closed(Client, {error, Else, Msg})
+        ok ->
+            {ok, Client};
+        {send,Result} ->
+            send(Client, Result),
+            {ok, Client};
+        {error,Reason} ->
+            send(Client, [{error, atom_to_binary(Reason, latin1)}]),
+            closed(Client, {error, Reason, Msg})
     end.
+
+close_client({SockType, Socket, #in_game{id=Id, game_pid=Game}}) ->
+    io:format("close game ~p~n", [Id]),
+    zen_session_sup:stop_session(Id),
+    %%erlang:demonitor(Game),
+    unlink(Game),
+    {SockType, Socket, closed}
+        ;
+close_client({SockType, Socket, _}) ->
+    {SockType, Socket, closed}.
 
 %%%===================================================================
 %%% authentication
@@ -119,15 +124,11 @@ login({Login, Password, Mod, _Lang},
             io:format("log in: ~p~n", [Auth]),
             Game = zen_session_sup:start_session(Id, Mod),
             link(Game),
-            %%erlang:monitor(Game),
-            send(Client, [{result,
-                           [{ok,
-                             [atom_to_binary(Group, latin1),
-                              Id,
-                              list_to_binary(Name)]}]}]),
-            {ok, {SockType, Socket, #in_game{id=Id,
-                                             module=Mod,
-                                             game_pid=Game}}};
+            
+            NewClient = {SockType, Socket, #in_game{id=Id,
+                                                    module=Mod,
+                                                    game_pid=Game}},
+            handle_message({logged_in, Group, Name}, NewClient);
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
             %%Text = zen_data:get_text(Lang, Else),

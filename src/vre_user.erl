@@ -35,9 +35,16 @@ start_link(Id) ->
 init([Id]) ->
     {ok, #user{login_id = Id}}.
 
+handle_call({logged_in, Group, Name}, _From, State) ->
+    Result = [{result,
+               [{ok, [atom_to_binary(Group, latin1),
+                      [{user, [State#user.login_id,
+                               list_to_binary(Name)]}]]}]}],
+
+    {reply, {send, Result}, State}
+        ;
 handle_call(_Request, _From, State) ->
-    Reply = ok,
-    {reply, Reply, State}.
+    {stop, unknown_message, {error,unknown_message}, State}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 

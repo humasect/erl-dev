@@ -45,8 +45,12 @@ handle_call([<<"get_room">>], _From, State) ->
     io:format("get room.~n"),
     {reply, ok, State}
         ;
+handle_call({logged_in, _Group, _Name}, _From, State) ->
+    %%From ! {send, [{change_room, []}]},
+    {reply, {send, {change_room, []}}, State}
+        ;
 handle_call(_Request, _From, State) ->
-    {reply, unknown_message, State}.
+    {stop, unknown_message, {error,unknown_message}, State}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 handle_info(_Info, State) -> {noreply, State}.
