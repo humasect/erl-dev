@@ -49,8 +49,8 @@ loop(Client = #tcp_client{socket=Socket}) ->
             ?MODULE:loop(Client);
        %% {'DOWN', Ref, process, Pid2, Reason} ->
         %    closed(
-        Else ->
-            closed(Client, Else)
+        {tcp_closed,_Socket} ->
+            closed(Client, tcp_closed)
     after
         ?TCP_TIMEOUT ->
             closed(Client, timeout)
@@ -137,7 +137,6 @@ login({Login, Password, Mod, _Lang},
     end.
 
 is_playing(Id) ->
-    io:format("aoeuaoeu ~p~n", [Id]),
     case zen_session_sup:which_session(Id) of
         undefined -> false;
         _ -> true
