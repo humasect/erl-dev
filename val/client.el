@@ -44,7 +44,8 @@
   (lco-log string)
   (let ((msg (json-read-from-string string)))
     ;;(cond ((equal (car msg) 
-    (lco-log (car msg))))
+    ;;(lco-log (car msg))
+    (lco-log (format "json: %s\n" msg))))
   ;;(lco-log (format "json: %s\n" (json-read-from-string string))))
 
 (defun lco-sentinel (proc what)
@@ -92,14 +93,19 @@
   ;;(switch-to-buffer (game-buffer)))
 
 (defun lco-move (angle)
-  (lco-send `(:client (:move ,angle))))
+  ;;(interactive "nAngle: ")
+  (lco-send `(:move ,angle)))
 
 (defun lco-init-keys ()
   (set-buffer (lco-game-buffer))
 
   (local-set-key "/" (lambda (cmd)
                        (interactive "sCommand: ")
-                       (lco-send `(:client (:command ,cmd)))))
+                       (lco-send `(:command ,cmd))))
+
+  (local-set-key "t" (lambda (msg)
+                       (interactive "sMessage: ")
+                       (lco-send `(:client (:say ,msg)))))
 
   (local-set-key "q" 'lco-quit)
 
@@ -127,15 +133,11 @@
   (lco-init)
 
   (lco-init-net user pass)
-  (lco-send `(:client (:login [,user ,pass "japanese"])))
-  )
+  (lco-send `(:login [,user ,pass "japanese"])))
 
 (defun lco-quit ()
   (interactive)
   (lco-log "Quit.")
   (delete-process lco-process))
 
-(defun lco-say (msg)
-  (interactive "sMessage: ")
-  (lco-send `(:client (:say ,msg))))
 

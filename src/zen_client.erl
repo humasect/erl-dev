@@ -74,54 +74,42 @@ process_data(Data, Client) ->
     Msg = jsx:json_to_term(Data),
     io:format("message = ~p~n", [Msg]),
     case Msg of
-        [{<<"client">>, RealMsg}] ->
-            handle_message(RealMsg, Client);
+        [{<<"client">>, [{<<"login">>, [User, Pass]}]}] ->
+            login({User, Pass, vre_user, english}, Client);
+        [{<<"login">>, [User, Pass, Language]}] ->
+            login({User, Pass, val_game, Language}, Client);
         Else ->
-            send(Client, [{error, <<"unknown_message">>}]),
-            {error, unknown_message, Else}
+            handle_message(Else, Client)
+        %%Else ->
+        %%    send(Client, [{error, <<"unknown_message">>}]),
+        %%    {error, unknown_message, Else}
     end.
 
-is_playing(Id) ->
-    case zen_session_sup:which_session(Id) of
-        undefined -> false;
-        _ -> true
+handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
+    io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
+    {ok, Client}
+        ;
+handle_message([{<<"client">>, [{<<"say">>, Text}]}],
+               Client = {_SockType, _Socket, #in_game{}})
+  when is_binary(Text) ->
+    zen_tcp:broadcast([{person_said, Text}]),
+    {ok, Client}
+        ;
+handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
+    %%Game = zen_session_sup:which_session(Id),
+    case gen_server:call(Game, Msg) of
+        ok -> {ok, Client};
+        Else ->
+            send(Client, [{error, atom_to_binary(Else, latin1)}]),
+            closed(Client, {error, Else, Msg})
     end.
 
-authorize({"dev", "dev", {127,0,0,1}, _Mod}) ->
-    {ok, dev, 0, "Developer"};
-authorize({"dev", "dev", _Ip, _Mod}) ->
-    {error,bad_credentials};
-authorize({Login, Password, Ip, _Mod}) ->
-    F = fun() ->
-                case mnesia:match_object(#account{login=Login,
-                                                  password=Password,
-                                                  _='_'}) of
-                    [#account{id=Id,name=Name,auth_count=Count} = Account] ->
-                        Update = Account#account{last_time=erlang:localtime(),
-                                                 last_ip=Ip,
-                                                 auth_count=Count+1},
-                        mnesia:write(Update),
-                        case is_playing(Id) of
-                            true -> id_in_use;
-                            false ->
-                                Group = zen_web:user_group(Login),
-                                {ok, Group, Id, Name}
-                        end;
-                    _ -> bad_credentials
-                end
-        end,
-    case mnesia:transaction(F) of
-        {atomic,Result} -> Result;
-        {aborted,Reason} -> {error,Reason}
-    end.
+%%%===================================================================
+%%% authentication
+%%%===================================================================
 
-handle_message([{<<"login">>, Creds}],
-               Client = {SockType, Socket, waiting_auth}) ->
-    {Mod,Login,Password,_Language} =
-        case Creds of
-            [User,Pass] -> {vre_user,User,Pass,english};
-            [User,Pass,Lang] -> {val_game,User,Pass,Lang}
-        end,
+login({Login, Password, Mod, _Lang},
+      Client = {SockType, Socket, waiting_auth}) ->
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
             ip_address(SockType, Socket),
@@ -145,24 +133,42 @@ handle_message([{<<"login">>, Creds}],
             %%Text = zen_data:get_text(Lang, Else),
             send(Client, [{result, [{error, atom_to_binary(Else,latin1)}]}]),
             {error, Else, Auth}
-    end
-        ;
-handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
-    io:format("errrrrrrrrrrrr, ~p~n", [Cmd]),
-    {ok, Client}
-        ;
-handle_message([{<<"say">>, Text}],
-               Client = {_SockType, _Socket, #in_game{}}) ->
-    zen_tcp:broadcast([{person_said, Text}]),
-    {ok, Client}
-        ;
-handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
-    %%Game = zen_session_sup:which_session(Id),
-    gen_server:cast(Game, Msg),
-    {ok, Client}
-        ;
-handle_message(Msg, State) ->
-    closed(State, {error, unhandled_message, Msg}).
+    end.
+
+is_playing(Id) ->
+    io:format("aoeuaoeu ~p~n", [Id]),
+    case zen_session_sup:which_session(Id) of
+        undefined -> false;
+        _ -> true
+    end.
+
+%%authorize({"dev", "dev", {127,0,0,1}, _Mod}) ->
+%%    {ok, dev, 0, "Developer"};
+%%authorize({"dev", "dev", _Ip, _Mod}) ->
+%%    {error,bad_credentials};
+authorize({Login, Password, Ip, _Mod}) ->
+    F = fun() ->
+                case mnesia:match_object(#account{login=Login,
+                                                  password=Password,
+                                                  _='_'}) of
+                    [#account{id=Id,name=Name,auth_count=Count} = Account] ->
+                        Update = Account#account{last_time=erlang:localtime(),
+                                                 last_ip=Ip,
+                                                 auth_count=Count+1},
+                        mnesia:write(Update),
+                        case is_playing(Id) of
+                            true -> id_in_use;
+                            false ->
+                                Group = zen_web:user_group(Login),
+                                {ok, Group, Id, Name}
+                        end;
+                    _ -> bad_credentials
+                end
+        end,
+    case mnesia:transaction(F) of
+        {atomic,Result} -> Result;
+        {aborted,Reason} -> {error,Reason}
+    end.
 
 %%%===================================================================
 %%% socket

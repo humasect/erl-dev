@@ -33,6 +33,9 @@ start_session(Id, Module) ->
     case supervisor:start_child(?SERVER, Spec) of
         {ok,Child} -> Child;
         {ok,Child,_} -> Child;
+        {error,already_present} ->
+            stop_session(Id),
+            start_session(Id, Module);
         {error,{already_started,Child}} -> Child;
         Else -> throw(Else)
     end.
@@ -45,9 +48,10 @@ stop_session(Id) ->
 
 which_session(Name) ->
     L = [C || {Id,C,_,_} <- supervisor:which_children(?SERVER), Id == Name],
+    io:format("yyyyyyyyyy ~p~n", [L]),
     case L of
         [Head] -> Head;
-        _ -> undefined
+        _Else -> undefined
     end.
 
 kill_all_sessions() ->

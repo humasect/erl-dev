@@ -46,7 +46,7 @@ handle_call([<<"get_room">>], _From, State) ->
     {reply, ok, State}
         ;
 handle_call(_Request, _From, State) ->
-    {reply, ok, State}.
+    {reply, unknown_message, State}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 handle_info(_Info, State) -> {noreply, State}.

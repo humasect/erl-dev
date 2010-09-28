@@ -1,28 +1,32 @@
 #+TITLE: /Current Work/
 
-#+OPTIONS: ^:{}
-
+#+SETUPFILE: setup.hrg
 #+INCLUDE: header.hrg
 
+* Erlang
 ** TODO zen_tcp:broadcaost to everyone, but zen_tcp:status_broadcast to status.
-** TODO print IP address
+** TODO fix print IP address on socket closed.
 ** TODO logging!
 ** TODO ping/pong timeout
 ** TODO one table per game: vre_account   val_account
 
-* Emacs
 
-** TODO iswitchでタブコンプリート!
+* Emacs
+** DONE iswitchでタブコンプリート!
+   CLOSED: [2010-09-28 Tue 01:57]
+   using 'ido'.
 ** TODO huma-project.elでgitとsvnコマンドを直す
    - user-mail-address シンボルはvoid
 ** DONE すべてのorg-modeファイルをthemiddle/org/に移動する
    CLOSED: [2010-09-16 Thu 18:08]
-** TODO user-mail-addressを直す！！
+** DONE user-mail-addressを直す！！
+   CLOSED: [2010-09-28 Tue 01:57]
+   hardcoded in '.emacs'
 ** TODO org-babel
 ** TODO freeze .emacs customizations into huma-custom.el
 
-* vre_server Previous Developer
 
+* vre_server Previous Developer
 ** TODO getting the vre_user.erl API to a simple API
    to manipulate user record
 ** TODO move the actual login
@@ -34,7 +38,6 @@
    the person object
 
 * vre_server開発
-
 ** TODO vre_serverを/lib/の外に移動する
 ** TODO vre_server.appがvre.appに名の変えて
 ** TODO ソースに@todoを探しとここに入り込んで
@@ -42,23 +45,18 @@
 
 * vre_serverネットワーク
 
-** TODO vre_netserver_supを消す
+** DONE vre_netserver_supを消す
+   CLOSED: [2010-09-28 Tue 01:58]
 ** DONE address in useを直す =)
    CLOSED: [2010-09-16 Thu 14:11]
-** TODO ..そしてvalのネットワーク道具からコピーする
+** DONE ..そしてvalのネットワーク道具からコピーする
+   CLOSED: [2010-09-28 Tue 01:58]
 ** TODO vre_protocol JSONとBSON
    [[http://github.com/JacobVorreuter/emongo/blob/master/src/emongo_bson.erl][github]]
 
 * vre_serverデータベース
 
 ** TODO ユーザを追加の問題
-#+BEGIN_SRC erlang
-   vre_admin:new_user("test", test, "test", 0, developer).
+   not needed.
 
-   %% それから：
-
-   {error,{badrecord,user},{bad_user_record,{"test","developer"}}}
-#+END_SRC
-
-* 
 #+INCLUDE: footer.hrg
