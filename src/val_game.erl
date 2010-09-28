@@ -41,6 +41,10 @@ handle_call([{<<"move">>, Angle}], _From, State) ->
     io:format("ok,move ~p~n", [Angle]),
     {reply, ok, State}
         ;
+handle_call([<<"get_room">>], _From, State) ->
+    io:format("get room.~n"),
+    {reply, ok, State}
+        ;
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 

@@ -4,6 +4,8 @@
 ;; Created: Thu Sep 16 10:32:40 MDT 2010
 ;;
 
+(global-set-key (kbd "s-.") 'lco)
+
 (require 'json)
 ;; http://edward.oconnor.cx/2006/03/json.el
 
@@ -20,7 +22,7 @@
   (get-buffer-create "*lco-game*"))
 
 (defun lco-log (msg)
-  (with-current-buffer (message-buffer)
+  (with-current-buffer (lco-message-buffer)
   ;;(set-buffer (message-buffer))
   ;;(buffer-end 1)
     (set-window-point (get-buffer-window (lco-message-buffer)) (point-max))
@@ -40,7 +42,10 @@
 
 (defun lco-filter (proc string)
   (lco-log string)
-  (lco-log (format "json: %s\n" (json-read-from-string string))))
+  (let ((msg (json-read-from-string string)))
+    ;;(cond ((equal (car msg) 
+    (lco-log (car msg))))
+  ;;(lco-log (format "json: %s\n" (json-read-from-string string))))
 
 (defun lco-sentinel (proc what)
   (lco-log what))
@@ -90,7 +95,7 @@
   (lco-send `(:client (:move ,angle))))
 
 (defun lco-init-keys ()
-  (set-buffer (game-buffer))
+  (set-buffer (lco-game-buffer))
 
   (local-set-key "/" (lambda (cmd)
                        (interactive "sCommand: ")
@@ -127,8 +132,10 @@
 
 (defun lco-quit ()
   (interactive)
+  (lco-log "Quit.")
   (delete-process lco-process))
 
 (defun lco-say (msg)
   (interactive "sMessage: ")
   (lco-send `(:client (:say ,msg))))
+

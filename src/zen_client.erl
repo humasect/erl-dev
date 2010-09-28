@@ -87,8 +87,8 @@ is_playing(Id) ->
         _ -> true
     end.
 
-authorize(Auth = {"dev", "dev", {127,0,0,1}, _Mod}) ->
-    authorize(Auth);
+authorize({"dev", "dev", {127,0,0,1}, _Mod}) ->
+    {ok, dev, 0, "Developer"};
 authorize({"dev", "dev", _Ip, _Mod}) ->
     {error,bad_credentials};
 authorize({Login, Password, Ip, _Mod}) ->
@@ -190,7 +190,10 @@ send(Client, Object) ->
 ip_address(web_client, WS) ->
     WS:get(peer_addr);
 ip_address(tcp_client, S) ->
-    {ok,{Address,_Port}} = inet:peername(S),
-    Address.
+    case inet:peername(S) of
+        {ok,{Address,_Port}} -> Address;
+        _Else -> {0,0,0,0}
+    end.
+
 
 
