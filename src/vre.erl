@@ -4,30 +4,30 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 22 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 28 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(vre_app).
+-module(vre).
 -author('humasect@gmail.com').
--behaviour(application).
 
-%% Application callbacks
--export([start/2, stop/1]).
+%% API
+-export([]).
+
+%% Appsup callbacks
+-export([start/0]).
+
+-include("vrenvironment.hrl").
 
 %%%===================================================================
-%%% Application callbacks
+%%% Actors
 %%%===================================================================
 
-start(_StartType, _StartArgs) ->
-    case vre_sup:start_link() of
-        {ok, Pid} ->
-            {ok, Pid};
-        Error ->
-            Error
-                end.
-
-stop(_State) ->
+create_actor(LoginId, Def) ->
+    
     ok.
 
 %%%===================================================================
-%%% Internal functions
+%%% Database
 %%%===================================================================
+
+init_db() ->
+    ?init_table(vre_object, ordered_set).

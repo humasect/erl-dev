@@ -39,6 +39,10 @@ stop_all() ->
 make_all_docs() ->
     lists:foreach(fun user_default:mkdoc/1, [zen, vre, val]).
 
+%%%===================================================================
+%%% Accounts
+%%%===================================================================
+
 -spec create_account(string(), string(), string(), user_group()) ->
                             ok | {error, term()}.
 %%% @doc add account.
@@ -77,10 +81,9 @@ remove_account(Id) ->
     mnesia:transaction(fun() -> mnesia:delete({account,Id}) end),
     zen_web:delete_user(Id).
 
--define(init_table(X,Y),
-        huma_db:init_table(X, Y, record_info(fields, X))).
--define(init_table(X,Y,T),
-        huma_db:init_table(X, Y, record_info(fields, X), T)).
+%%%===================================================================
+%%% Database
+%%%===================================================================
 
 init_db() ->
     ?init_table(httpd_user, bag),
@@ -106,18 +109,6 @@ init_db() ->
     ?MODULE:create_account("dev", "dev", "Developer", dev),
     ?MODULE:create_account("humasect", "sect0huma", "Lyndon Tremblay", player),
     ok.
-
--ifdef(asdfasd).
-    ?init_table(actor, ordered_set),
-    ?init_table(map  , ordered_set),
-    ?init_table(world, ordered_set,
-                fun
-                    ({world,Id,Seed}) ->
-                        #world{id=Id, seed=Seed}
-                end),
-    ok.
--endif.
-
 
 %%%===================================================================
 %%% Internal functions　内部の関数

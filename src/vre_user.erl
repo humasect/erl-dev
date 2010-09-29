@@ -35,14 +35,14 @@ start_link(Id) ->
 init([Id]) ->
     {ok, #user{login_id = Id}}.
 
-  handle_call([{<<"client">>, <<"get_time">>}], _From, State) ->
+handle_call([{<<"client">>, <<"get_time">>}], _From, State) ->
     {_Mega,Sec,_Micro} = now(),
     {reply, {send, [{result, [{ok, Sec}]}]}, State}
         ;
-handle_call({logged_in, Group, Name}, _From, State) ->
+handle_call({logged_in, ActorId, Group, Name}, _From, State) ->
     Result = [{result,
                [{ok, [atom_to_binary(Group, latin1),
-                      [{user, [State#user.login_id,
+                      [{user, [ActorId,
                                list_to_binary(Name)]}]]}]}],
     {reply, {send, Result}, State}
         ;

@@ -81,9 +81,9 @@ handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
     {ok, Client}
         ;
 handle_message([{<<"client">>, [{<<"say">>, Text}]}],
-               Client = {_SockType, _Socket, #in_game{}})
+               Client = {_SockType, _Socket, #in_game{id=Id}})
   when is_binary(Text) ->
-    zen_tcp:broadcast([{person_said, Text}]),
+    zen_tcp:broadcast([{person_said, [Id, Text]}]),
     {ok, Client}
         ;
 handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
@@ -120,7 +120,7 @@ login({Login, Password, Mod, _Lang},
             ip_address(SockType, Socket),
             Mod},
     case ?MODULE:authorize(Auth) of
-        {ok,Group,Id,Name} ->
+        {ok,Group,#account{id=Id,actor_id=ActorId,name=Name}} ->
             io:format("log in: ~p~n", [Auth]),
             Game = zen_session_sup:start_session(Id, Mod),
             link(Game),
@@ -128,7 +128,7 @@ login({Login, Password, Mod, _Lang},
             NewClient = {SockType, Socket, #in_game{id=Id,
                                                     module=Mod,
                                                     game_pid=Game}},
-            handle_message({logged_in, Group, Name}, NewClient);
+            handle_message({logged_in, ActorId, Group, Name}, NewClient);
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
             %%Text = zen_data:get_text(Lang, Else),
@@ -151,7 +151,7 @@ authorize({Login, Password, Ip, _Mod}) ->
                 case mnesia:match_object(#account{login=Login,
                                                   password=Password,
                                                   _='_'}) of
-                    [#account{id=Id,name=Name,auth_count=Count} = Account] ->
+                    [#account{id=Id,auth_count=Count} = Account] ->
                         Update = Account#account{last_time=erlang:localtime(),
                                                  last_ip=Ip,
                                                  auth_count=Count+1},
@@ -160,7 +160,7 @@ authorize({Login, Password, Ip, _Mod}) ->
                             true -> id_in_use;
                             false ->
                                 Group = zen_web:user_group(Login),
-                                {ok, Group, Id, Name}
+                                {ok, Group, Account}
                         end;
                     _ -> bad_credentials
                 end

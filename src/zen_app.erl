@@ -23,6 +23,7 @@
 start(_StartType, _StartArgs) ->
     %% @todo start logger.
     zen:init_db(),
+    vre:init_db(),
 
     case zen_sup:start_link() of
         {ok, Pid} ->
