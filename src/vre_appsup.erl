@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 28 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(nsv_appsup).
+-module(vre_appsup).
 -author('humasect@gmail.com').
 
 -behaviour(application).

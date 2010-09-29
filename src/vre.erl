@@ -10,10 +10,7 @@
 -author('humasect@gmail.com').
 
 %% API
--export([]).
-
-%% Appsup callbacks
--export([start/0]).
+-export([init_db/0]).
 
 -include("vrenvironment.hrl").
 
