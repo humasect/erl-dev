@@ -1,5 +1,6 @@
 #+TITLE: /Gamelike Prototype/
 
+#+SETUPFILE: setup.hrg
 #+INCLUDE: header.hrg
 
 The prototype offline application runs on Mac OS X and iPhone and iPad.
@@ -18,10 +19,20 @@ It was built in one month using:
 
 * Status
 
-  It is currently being ported to the [[webclient.org][Web client]].
-  There has been initial networking support being added if it were to be
-  continued to be supported as an official game client for
-  the [[valhalla.org][Valhalla server]].
+  - The prototype can be found in [[/Gamelike.app.zip][Gamelike.app.zip]]
+  - It is currently being ported to the [[webclient.org][Web client]].
+  - There has been initial networking support being added if it were to be
+    continued to be supported as an official game client for
+    the [[valhalla.org][Valhalla server]].
+
+* Notes
+
+  - Map is 'm' and Inventory is 'i'.
+  - Movement is number pad.
+  - The sword and shield are backwards for an uneventful reason. ^_^
+  - The warps between rooms are in the very center of the walls.
+  - There were 'door lights' to show the way but this version is a bit in between things and just before it was decided to be made multiplayer and portable.
+  - Also walking into walls is fun. =)
 
 * Screenshots
 

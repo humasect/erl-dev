@@ -30,18 +30,28 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
+    TcpPort = zen_app:get_env(tcp_port),
+    WebSocketPort = zen_app:get_env(websocket_port),
+
     {ok, {{one_for_one, 1, 6000},
      [
-      %% zen_logger
+      %% @todo zen_logger
 
-      {zen_tcp, {zen_tcp, start_link, []},
-       permanent, 2000, worker, [zen_tcp]},
+      %% acceptors
+      {zen_acceptor_tcp, {zen_acceptor, start_link,
+                          [zen_acceptor_tcp, TcpPort]},
+       permanent, 2000, worker, [zen_acceptor]},
+
+      {zen_acceptor_web, {zen_acceptor, start_link,
+                          [zen_acceptor_web, WebSocketPort]},
+       permanent, 2000, worker, [zen_acceptor]},
+
+      %% interfaces (web, irc)
+      {zen_irc_sup, {zen_irc_sup, start_link, []},
+       permanent, infinity, supervisor, [zen_irc_sup]},
 
       {zen_data, {zen_data, start_link, []},
        permanent, 2000, worker, [zen_data]},
-
-      {zen_irc_sup, {zen_irc_sup, start_link, []},
-       permanent, infinity, supervisor, [zen_irc_sup]},
 
       {zen_session_sup, {zen_session_sup, start_link, []},
        permanent, infinity, supervisor, [zen_session_sup]}

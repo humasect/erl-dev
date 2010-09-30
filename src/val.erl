@@ -4,27 +4,20 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 28 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
+%%% Created : 29 Sep 2010 by Lyndon Tremblay <humasect@gmail.com>
 %%%-------------------------------------------------------------------
--module(vre).
+-module(val).
 -author('humasect@gmail.com').
 
 %% API
--export([init_db/0, create_actor/2]).
+-export([init_db/0]).
 
--include("vrenvironment.hrl").
-
-%%%===================================================================
-%%% Actors
-%%%===================================================================
-
-create_actor(LoginId, Def) ->
-    
-    ok.
+-include("valhalla.hrl").
 
 %%%===================================================================
 %%% Database
 %%%===================================================================
 
 init_db() ->
-    ?init_table(vre_object, ordered_set).
+    ?init_table(val_room, ordered_set),
+    ?init_table(val_actor, ordered_set).

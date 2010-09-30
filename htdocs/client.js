@@ -8,7 +8,7 @@ client =
     {
         var Host = window.location.hostname?
             window.location.hostname: "localhost";
-        var Socket = new WebSocket("ws://"+Host+":8000/?" +
+        var Socket = new WebSocket("ws://"+Host+":1980/?" +
                                    "user="+User+"&pass="+Pass+"&lang="+
                                    text.language());
 

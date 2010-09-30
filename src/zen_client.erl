@@ -117,7 +117,7 @@ login({Login, Password, Mod, _Lang},
       Client = {SockType, Socket, waiting_auth}) ->
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
-            ip_address(SockType, Socket),
+            zen_acceptor:ip_address(Socket),
             Mod},
     case ?MODULE:authorize(Auth) of
         {ok,Group,#account{id=Id,actor_id=ActorId,name=Name}} ->
@@ -176,12 +176,12 @@ authorize({Login, Password, Ip, _Mod}) ->
 
 closed(Client = #web_client{socket=WS}, Reason) ->
     io:format("web socket: ~w ~w ~p.~n",
-              [ip_address(web_client,WS), WS:get(socket), Reason]),
+              [zen_acceptor:ip_address(WS), WS:get(socket), Reason]),
     close_client(Client)
         ;
 closed(Client = #tcp_client{socket=S}, Reason) ->     
     io:format("tcp socket: ~w ~w ~p.~n",
-              [ip_address(tcp_client,S), S, Reason]),
+              [zen_acceptor:ip_address(S), S, Reason]),
     close_client(Client).
 
 send_raw(#web_client{socket=WS}, Data) ->
@@ -192,14 +192,5 @@ send_raw(#tcp_client{socket=S}, Data) ->
 
 send(Client, Object) ->
     send_raw(Client, [jsx:term_to_json(Object), $\n]).
-
-ip_address(web_client, WS) ->
-    WS:get(peer_addr);
-ip_address(tcp_client, S) ->
-    case inet:peername(S) of
-        {ok,{Address,_Port}} -> Address;
-        _Else -> {0,0,0,0}
-    end.
-
 
 

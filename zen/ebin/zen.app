@@ -16,7 +16,9 @@
   {mod, {zen_app,[]}},   % only needed if application needs to be started
   {env, [
          {web_port, 8000},
+
          {tcp_port, 1979},
+         {websocket_port, 1980},
 
          {irc_server, "irc.mibbit.net"},
          {irc_port, 6667},

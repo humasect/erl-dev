@@ -17,7 +17,7 @@
 %% Map Server %%
 %%------------%%
 
--record(room,
+-record(val_room,
         {
           %%triggers=[],
           cells=[]
@@ -27,7 +27,7 @@
         {
           id :: uinteger(),
           class,
-          rooms=[] :: #room{}
+          rooms=[] :: #val_room{}
         }).
 
 -record(cell_index,
@@ -64,7 +64,7 @@
           equipment=[] :: [#item_dict{}]
         }).
 
--record(actor,
+-record(val_actor,
         {
           id :: uinteger(),
           cell_index :: #cell_index{},

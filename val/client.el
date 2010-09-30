@@ -30,23 +30,30 @@
     (insert msg)))
   ;;(set-buffer (other-buffer)))
 
+
+(defun lco-change-room (room)
+  (lco-log (format "change room! %s" room))
+  (with-current-buffer (lco-game-buffer)
+    (erase-buffer)))
+
+;;--------------------------------------------------------------
+;; network
+;;--------------------------------------------------------------
+
 (defvar lco-process nil)
 
 (defun lco-send (obj)
   (setq str (json-encode obj))
   (process-send-string lco-process str))
 
-;;--------------------------------------------------------------
-;; network
-;;--------------------------------------------------------------
-
 (defun lco-filter (proc string)
   (lco-log string)
-  (let ((msg (json-read-from-string string)))
-    ;;(cond ((equal (car msg) 
-    ;;(lco-log (car msg))
-    (lco-log (format "json: %s\n" msg))))
-  ;;(lco-log (format "json: %s\n" (json-read-from-string string))))
+  (let* ((msg (car (json-read-from-string string)))
+         (name (car msg))
+         (args (cdr msg)))
+    (cond ((eq name 'change_room) (lco-change-room))
+          (t (lco-log (format "json: %s\n" msg)))
+          )))
 
 (defun lco-sentinel (proc what)
   (lco-log what))
@@ -84,6 +91,7 @@
 
   (select-frame f)
   (switch-to-buffer (lco-message-buffer))
+  (setq buffer-read-only t)
   ;;(delete-region (point-min) (point-max))
   (setq w2 (split-window (selected-window) 10))
   (select-window w2)
