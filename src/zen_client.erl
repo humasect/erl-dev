@@ -38,16 +38,21 @@ run(Address, Socket) ->
 
 loop(Client = #client{socket=Socket}) ->
     inet:setopts(Socket, [{active,once}]),
-    io:format("aoeuaoeuaoeuaoeuaoeu~n"),
+    Process = fun(Data) ->
+                      case process_data(Data, Client) of
+                          {ok,NewState} -> ?MODULE:loop(NewState);
+                          Else -> closed(Client, Else)
+                      end
+              end,
     receive
         {tcp,_,Data = <<${,_/binary>>} ->
-            case process_data(Data, Client) of
-                {ok,NewState} ->
-                    ?MODULE:loop(NewState);
-                Else ->
-                    closed(Client, Else)
-            end;
+            Process(Data);
+        {tcp,_,Data = <<0,${,_/binary>>} ->
+            Process(binary:part(Data, 1, byte_size(Data)-2));
         {tcp,_,Data} ->
+            io:format("oaeuaoeu '~s'~n", [Data]),
+            %%case {binary:first(Data), binary:last(Data)} of
+            %%    {0,255} -> 
             closed(Client, {invalid_data, Data});
         {send,Object} ->
             send(Client, Object),
@@ -66,6 +71,7 @@ loop(Client = #client{socket=Socket}) ->
 %%%===================================================================
 
 process_data(Data, Client) ->
+    io:format("daaaaaaaata = '~s'~n", [Data]),
     Msg = jsx:json_to_term(Data),
     io:format("message = ~p~n", [Msg]),
     case Msg of
@@ -102,7 +108,10 @@ handle_message(Msg, Client = #client{status=#in_game{game_pid=Game}}) ->
         {error,Reason} ->
             send(Client, [{error, atom_to_binary(Reason, latin1)}]),
             closed(Client, {error, Reason, Msg})
-    end.
+    end
+        ;
+handle_message(Msg, _Client) ->
+    {error, not_logged_in, Msg}.
 
 close_client(Client = #client{status=#in_game{id=Id, game_pid=Game}}) ->
     io:format("close game ~p~n", [Id]),

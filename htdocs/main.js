@@ -27,7 +27,7 @@ function send_command()
     if (Command.val().trim() == "")
         return;
 
-    client.send_object({command: Command.val()});
+    client.send_object({'command': Command.val()});
     Command.val("");
 }
 
@@ -89,7 +89,7 @@ document.onkeydown = function(e)
     var s = String.fromCharCode(e.which || e.keyCode);
 
     if (s in angle_map)
-        send_message({'move': angle_map[s]});
+        client.send_object({'move': angle_map[s]});
 		//world.turn ({target: world.player, angle: angle});
 	else
 		console.log("テスト '" + s + "'");

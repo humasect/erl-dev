@@ -125,7 +125,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 process_socket(zen_acceptor_tcp, _Address, _Socket) -> ok;
 process_socket(zen_acceptor_web, Address, Socket) ->
-    inet:setopts(Socket, [{packet, raw}, {active, false}]),
+    %%inet:setopts(Socket, [{packet, raw}, {active, false}]),
     case gen_tcp:recv(Socket, 0, 5000) of
         {ok,Data} ->
             Lines = string:tokens(binary_to_list(Data), "\r"),
@@ -140,7 +140,7 @@ process_socket(zen_acceptor_web, Address, Socket) ->
                                       {K,V}
                               end
                       end, Lines),
-            io:format("header-- ~p~n", [Lines]),
+            %%io:format("header-- ~p~n", [Lines]),
 
             Origin = proplists:get_value("\nOrigin:", Props),
             Host = proplists:get_value("\nHost:", Props),
@@ -153,9 +153,8 @@ process_socket(zen_acceptor_web, Address, Socket) ->
                     "Sec-WebSocket-Location: ws://", Host ++ "/",
                     "\r\n\r\n",
                     build_challenge(Key1, Key2, Key3)],
-            io:format("body---- ~p~n", [Body]),
+            %%io:format("body---- ~p~n", [Body]),
             gen_tcp:send(Socket, Body);
-            %%io:format("WEB ~p: some data: ~s~n", [Address]);
         Else ->
             io:format("WEB ~p: no data. ~p~n", [Address,Else])
     end.

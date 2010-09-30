@@ -14,8 +14,7 @@ client =
 
         Socket.onopen = function(e)
         {
-            //var Msg = {'login': [user, pass, get_language()]};
-            //_client.socket.send(JSON.stringify(Msg));
+            client.send_object({'login': [User, Pass, text.language()]});
 
             client.is_connected = true;
             $('#login_panel').hide();
@@ -23,7 +22,7 @@ client =
             $('#connect_status').html(text.get('connect'));
         };
 
-        Socket.onclose = function(e)
+        Socket.onclose = function(E)
         {
             if (!client.is_connected)
                 alert("Could not connect to server!");
@@ -34,19 +33,19 @@ client =
             $('#connect_status').html(text.get('disconnect'));
         };
 
-        Socket.onerror = function (e)
+        Socket.onerror = function(E)
         {
-            alert("socket error:" + e.type);
+            alert("socket error:" + E.type);
         };
 
-        Socket.onmessage = function (e)
+        Socket.onmessage = function(E)
         {
             var Object = null;
 
             try {
-                Object = JSON.parse(e.data);
+                Object = JSON.parse(E.data);
             } catch (x) {
-                log(e.data);
+                log(E.data);
                 log("Could not parse JSON!");
             }
 
@@ -115,6 +114,7 @@ client =
     send_object: function(Object)
     {
         var Message = JSON.stringify(Object);
+        log("aoeuaoeu: " + Message);
         client.socket.send(Message);
     },
 };
