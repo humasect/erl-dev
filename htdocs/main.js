@@ -4,16 +4,16 @@
 
 function login()
 {
-    var User = dom.element('user_name');
-    if (User.value.trim() == "")
+    var User = $('#user_name');
+    if (User.val().trim() == "")
         return;
 
-    var Pass = dom.element('pass_word');
-    if (Pass.value.trim() == "")
+    var Pass = $('#pass_word');
+    if (Pass.val().trim() == "")
         return;
 
-    client.start(User.value, Pass.value);
-    Pass.value = "";
+    client.start(User.val(), Pass.val());
+    Pass.val("");
 }
 
 function logout()
@@ -23,12 +23,12 @@ function logout()
 
 function send_command()
 {
-    var Command = dom.element('command');
-    if (Command.value.trim() == "")
+    var Command = $('#command');
+    if (Command.val().trim() == "")
         return;
 
-    client.send_object({command: Command.value});
-    Command.value = "";
+    client.send_object({command: Command.val()});
+    Command.val("");
 }
 
 function log(String)
@@ -39,12 +39,12 @@ function log(String)
 window.onload = function()
 {
     text.init();
-    dom.element('user_name').value = localStorage['user_name'];
+    $('#user_name').val(localStorage['user_name']);
 
     function show_login()
     {
-        dom.element('login_status').innerHTML = text.get('log_in');
-        dom.show('login_panel');
+        $('#login_status').html(text.get('log_in'));
+        $('#login_panel').show();
     }
 
     ('WebSocket' in window)

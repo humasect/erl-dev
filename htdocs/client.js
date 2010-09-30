@@ -8,9 +8,9 @@ client =
     {
         var Host = window.location.hostname?
             window.location.hostname: "localhost";
-        var Socket = new WebSocket("ws://"+Host+":1980/?" +
-                                   "user="+User+"&pass="+Pass+"&lang="+
-                                   text.language());
+        var Socket = new WebSocket("ws://"+Host+":1980/");// +
+                                   //"user="+User+"&pass="+Pass+"&lang="+
+                                   //text.language());
 
         Socket.onopen = function(e)
         {
@@ -18,9 +18,9 @@ client =
             //_client.socket.send(JSON.stringify(Msg));
 
             client.is_connected = true;
-            dom.hide('login_panel');
-            dom.show('game');
-            dom.element('connect_status').innerHTML = text.get('connect');
+            $('#login_panel').hide();
+            $('#game').show();
+            $('#connect_status').html(text.get('connect'));
         };
 
         Socket.onclose = function(e)
@@ -29,9 +29,9 @@ client =
                 alert("Could not connect to server!");
 
             client.is_connected = false;
-            dom.show('login_panel');
-            dom.hide('game');
-            dom.element('connect_status').innerHTML = text.get('disconnect');
+            $('#login_panel').show();
+            $('#game').hide();
+            $('#connect_status').html(text.get('disconnect'));
         };
 
         Socket.onerror = function (e)
@@ -90,8 +90,8 @@ client =
     {
         'error': function(Client, Message)
         {
-            dom.sethtml('login_status', Message);
-            dom.show('login_panel');
+            $('#login_status').html(Message);
+            $('#login_panel').show();
 
             // disconnect..
         },
@@ -104,7 +104,7 @@ client =
 
     start: function(User, Pass)
     {
-        dom.element('connect_status').innerHTML = text.get('connecting');
+        $('#connect_status').html(text.get('connecting'));
 
         client.is_connected = false;
         client.socket = client.create_socket(User, Pass);

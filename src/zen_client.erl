@@ -9,10 +9,11 @@
 -module(zen_client).
 -author('humasect@gmail.com').
 
--export([loop/1]).
+%% API
+-export([run/2]).
 
 -define(TCP_TIMEOUT, 120*1000).
--export([authorize/1]).
+-export([authorize/1, loop/1]).
 
 -include("zen_account.hrl").
 
@@ -21,19 +22,23 @@
          module :: atom(),
          game_pid :: pid()}).
 
--define(client_def,
+-record(client,
         {socket,
+         address,
          status :: waiting_auth | #in_game{}}).
-
--record(tcp_client, ?client_def).
--record(web_client, ?client_def).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
-loop(Client = #tcp_client{socket=Socket}) ->
+run(Address, Socket) ->
+    ?MODULE:loop(#client{address = Address,
+                         socket = Socket,
+                         status = waiting_auth}).
+
+loop(Client = #client{socket=Socket}) ->
     inet:setopts(Socket, [{active,once}]),
+    io:format("aoeuaoeuaoeuaoeuaoeu~n"),
     receive
         {tcp,_,Data = <<${,_/binary>>} ->
             case process_data(Data, Client) of
@@ -81,12 +86,12 @@ handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
     {ok, Client}
         ;
 handle_message([{<<"client">>, [{<<"say">>, Text}]}],
-               Client = {_SockType, _Socket, #in_game{id=Id}})
+               Client = #client{status=#in_game{id=Id}})
   when is_binary(Text) ->
     zen_tcp:broadcast([{person_said, [Id, Text]}]),
     {ok, Client}
         ;
-handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
+handle_message(Msg, Client = #client{status=#in_game{game_pid=Game}}) ->
     %%Game = zen_session_sup:which_session(Id),
     case gen_server:call(Game, Msg) of
         ok ->
@@ -99,35 +104,34 @@ handle_message(Msg, Client = {_SockType, _Socket, #in_game{game_pid=Game}}) ->
             closed(Client, {error, Reason, Msg})
     end.
 
-close_client({SockType, Socket, #in_game{id=Id, game_pid=Game}}) ->
+close_client(Client = #client{status=#in_game{id=Id, game_pid=Game}}) ->
     io:format("close game ~p~n", [Id]),
     zen_session_sup:stop_session(Id),
     %%erlang:demonitor(Game),
     unlink(Game),
-    {SockType, Socket, closed}
+    Client#client{status=closed}
         ;
-close_client({SockType, Socket, _}) ->
-    {SockType, Socket, closed}.
+close_client(Client) ->
+    Client#client{status=closed}.
 
 %%%===================================================================
 %%% authentication
 %%%===================================================================
 
 login({Login, Password, Mod, _Lang},
-      Client = {SockType, Socket, waiting_auth}) ->
+      Client = #client{address=Addr, status=waiting_auth}) ->
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
-            zen_acceptor:ip_address(Socket),
-            Mod},
+            Addr, Mod},
     case ?MODULE:authorize(Auth) of
         {ok,Group,#account{id=Id,actor_id=ActorId,name=Name}} ->
             io:format("log in: ~p~n", [Auth]),
             Game = zen_session_sup:start_session(Id, Mod),
             link(Game),
             
-            NewClient = {SockType, Socket, #in_game{id=Id,
-                                                    module=Mod,
-                                                    game_pid=Game}},
+            NewClient = Client#client{status = #in_game{id = Id,
+                                                        module = Mod,
+                                                        game_pid = Game}},
             handle_message({logged_in, ActorId, Group, Name}, NewClient);
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
@@ -174,20 +178,11 @@ authorize({Login, Password, Ip, _Mod}) ->
 %%% socket
 %%%===================================================================
 
-closed(Client = #web_client{socket=WS}, Reason) ->
-    io:format("web socket: ~w ~w ~p.~n",
-              [zen_acceptor:ip_address(WS), WS:get(socket), Reason]),
-    close_client(Client)
-        ;
-closed(Client = #tcp_client{socket=S}, Reason) ->     
-    io:format("tcp socket: ~w ~w ~p.~n",
-              [zen_acceptor:ip_address(S), S, Reason]),
+closed(Client = #client{address=Addr, socket=S}, Reason) ->     
+    io:format("tcp socket: ~w ~w ~p.~n", [Addr, S, Reason]),
     close_client(Client).
 
-send_raw(#web_client{socket=WS}, Data) ->
-    WS:send(Data)
-        ;
-send_raw(#tcp_client{socket=S}, Data) ->
+send_raw(#client{socket=S}, Data) ->
     gen_tcp:send(S, Data).
 
 send(Client, Object) ->

@@ -58,7 +58,7 @@ text =
         for (var I in Keys)
         {
             Key = Keys[I];
-            dom.element(Key).innerHTML = text.get(Key);
+            $('#' + Key).html(text.get(Key));
         }
     }
 };

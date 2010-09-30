@@ -21,7 +21,6 @@
 
 %% API
 -export([start_link/2]).
--export([ip_address/1]).
 
 %% callbacks
 -export([init/1, terminate/2,
@@ -124,34 +123,66 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-acceptor_init(Type = zen_acceptor_tcp, ListenSocket) ->
-    case gen_tcp:accept(ListenSocket) of
-        {ok,Socket} ->
-            Address = ip_address(Socket),
-            io:format("TCP ~w connected.~n", [Address]),
-            gen_server:cast(Type, {add_client, self()}),
-            inet:setopts(Socket, ?ACCEPT_OPTS),
-            zen_client:loop({tcp_client, Socket, waiting_auth});
+process_socket(zen_acceptor_tcp, _Address, _Socket) -> ok;
+process_socket(zen_acceptor_web, Address, Socket) ->
+    inet:setopts(Socket, [{packet, raw}, {active, false}]),
+    case gen_tcp:recv(Socket, 0, 5000) of
+        {ok,Data} ->
+            Lines = string:tokens(binary_to_list(Data), "\r"),
+            <<10,Key3/binary>> = list_to_binary(lists:last(Lines)),
+            Props = lists:map(
+                      fun(P) ->
+                              case string:str(P, ": ") of
+                                  0 -> {"",""}; %string:str(P, " ");
+                                  I ->                              
+                                      K = string:substr(P, 1, I),
+                                      V = string:substr(P, I+2),
+                                      {K,V}
+                              end
+                      end, Lines),
+            io:format("header-- ~p~n", [Lines]),
+
+            Origin = proplists:get_value("\nOrigin:", Props),
+            Host = proplists:get_value("\nHost:", Props),
+            Key1 = proplists:get_value("\nSec-WebSocket-Key1:", Props),
+            Key2 = proplists:get_value("\nSec-WebSocket-Key2:", Props),
+            Body = ["HTTP/1.1 101 WebSocket Protocol Handshake\r\n",
+                    "Upgrade: WebSocket\r\n",
+                    "Connection: Upgrade\r\n",
+                    "Sec-WebSocket-Origin: ", Origin, "\r\n",
+                    "Sec-WebSocket-Location: ws://", Host ++ "/",
+                    "\r\n\r\n",
+                    build_challenge(Key1, Key2, Key3)],
+            io:format("body---- ~p~n", [Body]),
+            gen_tcp:send(Socket, Body);
+            %%io:format("WEB ~p: some data: ~s~n", [Address]);
         Else ->
-            io:format("*** accept returned ~w.", [Else]),
-            exit({error, {bad_accept, Else}})
-    end
-        ;
-acceptor_init(Type = zen_acceptor_web, ListenSocket) ->
+            io:format("WEB ~p: no data. ~p~n", [Address,Else])
+    end.
+
+acceptor_init(Type, ListenSocket) ->
     case gen_tcp:accept(ListenSocket) of
         {ok,Socket} ->
             Address = ip_address(Socket),
-            io:format("WEB ~w connected.~n", [Address]),
+            io:format("~w connected.~n", [Address]),
             gen_server:cast(Type, {add_client, self()}),
-            case gen_tcp:recv(Socket, 0, 5000) of
-                {ok,Data} ->
-                    Header = binary_to_list(Data),
-                    io:format("WEB ~p: some data: ~s~n", [Address,Data]);
-                Else ->
-                    io:format("WEB ~p: no data. ~p~n", [Address,Else])
-            end;
+            process_socket(Type, Address, Socket),
+            inet:setopts(Socket, ?ACCEPT_OPTS),
+            zen_client:run(Address, Socket);
         Else ->
             io:format("*** accept returned ~w.", [Else]),
             exit({error, {bad_accept, Else}})
     end.
-                        
+
+%% Code portions from Sergio Veiga
+%%http://sergioveiga.com/index.php/2010/06/17/websocket-handshake-76-in-erlang
+build_challenge(Key1, Key2, Key3) ->
+	Ikey1 = [D || D <- Key1, $0 =< D, D =< $9],
+	Ikey2 = [D || D <- Key2, $0 =< D, D =< $9],
+	Blank1 = length([D || D <- Key1, D =:= 32]),
+	Blank2 = length([D || D <- Key2, D =:= 32]),
+	Part1 = list_to_integer(Ikey1) div Blank1,
+	Part2 = list_to_integer(Ikey2) div Blank2,
+	Ckey = <<Part1:4/big-unsigned-integer-unit:8,
+             Part2:4/big-unsigned-integer-unit:8, Key3/binary>>,
+	erlang:md5(Ckey).
