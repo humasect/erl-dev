@@ -118,6 +118,9 @@ config(inets) ->
      %%{security_directory, {Priv++"/www/game",
      %%                      [{security_data_file, "security.dat"}]}},
 
+     {mime_types, [{"html","text/html"},
+                   {"htm","text/html"},
+                   {"svg","image/svg+xml"}]},
      {directory_index, ["index.html"]},
      {server_admin, "humasect@gmail.com"},
 

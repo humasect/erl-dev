@@ -9,72 +9,74 @@
 
 -include("huma.hrl").
 
-%%%-type(class() :: {atom(), atom(), atom()}).
-
--record(class, {attribute, job, family}).
+%%-type(class() :: {atom(), atom(), atom()}).
+%%-record(class, {attribute, job, family}).
 
 %%------------%%
-%% Map Server %%
+%% Map        %%
 %%------------%%
 
--record(val_room,
-        {
-          %%triggers=[],
-          cells=[]
-        }).
+-define(CELL_DEF,
+        tile = 0,
+        item_id,
+        char_id,
+        action).
 
--record(map,
-        {
-          id :: uinteger(),
-          class,
-          rooms=[] :: #val_room{}
-        }).
+-record(wall, {?CELL_DEF}).
+-record(floor, {?CELL_DEF}).
+-record(warp, {?CELL_DEF}).
 
--record(cell_index,
-        {
-          map_id :: uinteger(),
-          room_id :: uinteger(),
-          location={0,0} :: #point{}
-         }).
+-type(map_index() :: {integer(), integer()}).
+-type(map_cell() :: empty | #wall{} | #floor{} | #warp{}).
+
+-record(val_map,
+        {id,
+         cells = dict:new() % dictionary()
+        }).
 
 %%--------------%%
-%% Actor Server %%
+%% Actor        %%
 %%--------------%%
 
 -define(MAX_PLAYER_INVENTORY, 24).
--define(MAX_CHAR_INVENTORY, 1).
+-define(MAX_MONSTER_INVENTORY, 1).
 -define(MAX_STORAGE, 80).
 
--record(item_dict,
-        {
-          amount=1 :: pos_integer(),
-          status=normal :: cursed | blessed | normal,
-          cost=0 :: uinteger(),
-          charge_cost=0 :: uinteger(),
-          weight=1 :: uinteger()
+-record(item,
+        {amount=1 :: pos_integer(),
+         status=normal :: normal | cursed | blessed,
+         cost=0 :: uinteger(),
+         charge_cost=0 :: uinteger(),
+         weight=1 :: uinteger()
         }).
 
--record(char_dict,
-        {
-          party_id=0 :: uinteger(),
-          base_level={1,0}, % :: range(),
-          job_level={1,0}, % :: range(),
-          stats=[],
-          inventory=[] :: [#item_dict{}],
-          equipment=[] :: [#item_dict{}]
-        }).
+-record(char_stats,
+        {hp, max_hp,
+         sp, max_sp,
+         str, int, dex, agi, luk}).
+
+-define(CHAR_DEF,
+        base_level={1,0},
+        stats :: #char_stats{},
+        condition=normal :: normal|asleep|confused|poison|mute,
+        inventory=[] :: [#item{}],
+        equipment=[] :: [#item{}]).
+
+-record(monster, {?CHAR_DEF}).
+-record(character, {?CHAR_DEF}).
+-record(player, {?CHAR_DEF,
+                 party_id=0 :: uinteger(),
+                 job_level={1,0}
+                }).
 
 -record(val_actor,
-        {
-          id :: uinteger(),
-          cell_index :: #cell_index{},
-
-          class,
-          dict :: [#item_dict{} | #char_dict{}]
+        {id :: uinteger(),
+         class,
+         dict :: [#item{} | #character{} | #monster{} | #player{}]
         }).
 
 %%-------------%%
-%% Game Server %%
+%% Game        %%
 %%-------------%%
 
 -record(world,

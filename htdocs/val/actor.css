@@ -1,0 +1,46 @@
+div.Character {
+    background-image:
+    	-webkit-gradient(radial,
+			center center, 56, center center, 64,
+			from(transparent),
+			color-stop(0.8, rgba(255, 255, 255, 0.65)),
+			to(rgba(255, 255, 255, 0.4))),
+
+        -webkit-gradient(radial,
+       		64 192, 32, 128 128, 192,
+        	color-stop(0.5, transparent),
+        	color-stop(0.5, rgba(255, 255, 255, 0.2)),
+        	to(rgba(255, 255, 255, 0.65)));
+
+    -webkit-box-reflect: below 0 -webkit-gradient(linear,
+    	left top, left bottom,
+    	from(transparent),
+    	color-stop(0.5, transparent),
+    	to(rgba(255, 255, 255, 0.25)));
+
+    z-index: 1;
+
+    position: absolute;
+    width: 128px;
+    height: 128px;          
+
+    border-radius: 64px;
+}
+
+#character_text {
+    position: absolute;
+    top: -8px;
+    left: 0px;
+    right: 0;
+    bottom: 0;
+
+    font-size: 54pt;
+    line-height: 0.8em;
+    text-align: center;
+    text-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+    letter-spacing: -3px;
+    -webkit-text-stroke: 0.5px gray;
+    color: white;
+
+    /* -webkit-transform: rotate(25deg); */
+}

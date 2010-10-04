@@ -110,7 +110,7 @@ handle_cast({broadcast, Msg}, State = #state{clients=Clients}) ->
     lists:foreach(fun(C) -> C ! {send,Msg} end, Clients),
     {noreply, State}.
 
-handle_info({'DOWN', _Ref, process, Pid2, Reason},
+handle_info({'DOWN', _Ref, process, Pid2, _Reason},
             State = #state{clients=Clients}) ->
     NewClients = lists:delete(Pid2, Clients),
     %%io:format("client died: ~p~n", [Reason]),
@@ -129,7 +129,6 @@ process_socket(zen_acceptor_web, Address, Socket) ->
     case gen_tcp:recv(Socket, 0, 5000) of
         {ok,Data} ->
             Lines = string:tokens(binary_to_list(Data), "\r"),
-            <<10,Key3/binary>> = list_to_binary(lists:last(Lines)),
             Props = lists:map(
                       fun(P) ->
                               case string:str(P, ": ") of
@@ -142,18 +141,12 @@ process_socket(zen_acceptor_web, Address, Socket) ->
                       end, Lines),
             %%io:format("header-- ~p~n", [Lines]),
 
-            Origin = proplists:get_value("\nOrigin:", Props),
-            Host = proplists:get_value("\nHost:", Props),
-            Key1 = proplists:get_value("\nSec-WebSocket-Key1:", Props),
-            Key2 = proplists:get_value("\nSec-WebSocket-Key2:", Props),
-            Body = ["HTTP/1.1 101 WebSocket Protocol Handshake\r\n",
-                    "Upgrade: WebSocket\r\n",
-                    "Connection: Upgrade\r\n",
-                    "Sec-WebSocket-Origin: ", Origin, "\r\n",
-                    "Sec-WebSocket-Location: ws://", Host ++ "/",
-                    "\r\n\r\n",
-                    build_challenge(Key1, Key2, Key3)],
-            %%io:format("body---- ~p~n", [Body]),
+            Body = case proplists:get_value("\nSec-WebSocket-Key1:", Props) of
+                       undefined -> websocket_body(Props);
+                       Key1 -> websocket_body(Key1, Lines, Props)
+                   end,
+
+            %io:format("body---- ~p~n", [Body]),
             gen_tcp:send(Socket, Body);
         Else ->
             io:format("WEB ~p: no data. ~p~n", [Address,Else])
@@ -167,11 +160,36 @@ acceptor_init(Type, ListenSocket) ->
             gen_server:cast(Type, {add_client, self()}),
             process_socket(Type, Address, Socket),
             inet:setopts(Socket, ?ACCEPT_OPTS),
-            zen_client:run(Address, Socket);
+            zen_client:run(Type, Socket, Address);
         Else ->
             io:format("*** accept returned ~w.", [Else]),
             exit({error, {bad_accept, Else}})
     end.
+
+%% websocket stuff
+
+websocket_body(Props, Space) ->
+    {proplists:get_value("\nOrigin:", Props),
+     proplists:get_value("\nHost:", Props),
+     ["HTTP/1.1 101 Web"++Space++"Socket Protocol Handshake\r\n",
+     "Upgrade: WebSocket\r\n",
+     "Connection: Upgrade\r\n"]}.
+
+websocket_body(Key1, Lines, Props) ->
+    {Origin,Host,Header} = websocket_body(Props, []),
+    <<10,Key3/binary>> = list_to_binary(lists:last(Lines)),
+    Key1 = proplists:get_value("\nSec-WebSocket-Key1:", Props),
+    Key2 = proplists:get_value("\nSec-WebSocket-Key2:", Props),
+    Header ++ ["Sec-WebSocket-Origin: ", Origin, "\r\n",
+               "Sec-WebSocket-Location: ws://", Host ++ "/",
+               "\r\n\r\n",
+               build_challenge(Key1, Key2, Key3)].
+
+websocket_body(Props) ->
+    {Origin,Host,Header} = websocket_body(Props, " "),
+    Header ++ ["WebSocket-Origin: ", Origin , "\r\n",
+               "WebSocket-Location: ws://", Host ++ "/",
+               "\r\n\r\n"].
 
 %% Code portions from Sergio Veiga
 %%http://sergioveiga.com/index.php/2010/06/17/websocket-handshake-76-in-erlang

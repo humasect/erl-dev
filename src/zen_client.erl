@@ -10,7 +10,7 @@
 -author('humasect@gmail.com').
 
 %% API
--export([run/2]).
+-export([run/3]).
 
 -define(TCP_TIMEOUT, 120*1000).
 -export([authorize/1, loop/1]).
@@ -23,7 +23,8 @@
          game_pid :: pid()}).
 
 -record(client,
-        {socket,
+        {socktype,
+         socket,
          address,
          status :: waiting_auth | #in_game{}}).
 
@@ -31,9 +32,10 @@
 %%% API
 %%%===================================================================
 
-run(Address, Socket) ->
-    ?MODULE:loop(#client{address = Address,
+run(Type, Socket, Address) ->
+    ?MODULE:loop(#client{socktype = Type,
                          socket = Socket,
+                         address = Address,
                          status = waiting_auth}).
 
 loop(Client = #client{socket=Socket}) ->
@@ -47,12 +49,9 @@ loop(Client = #client{socket=Socket}) ->
     receive
         {tcp,_,Data = <<${,_/binary>>} ->
             Process(Data);
-        {tcp,_,Data = <<0,${,_/binary>>} ->
+        {tcp,_,Data = <<0,${,_/binary>>} ->  % WebSocket
             Process(binary:part(Data, 1, byte_size(Data)-2));
         {tcp,_,Data} ->
-            io:format("oaeuaoeu '~s'~n", [Data]),
-            %%case {binary:first(Data), binary:last(Data)} of
-            %%    {0,255} -> 
             closed(Client, {invalid_data, Data});
         {send,Object} ->
             send(Client, Object),
@@ -145,7 +144,11 @@ login({Login, Password, Mod, _Lang},
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
             %%Text = zen_data:get_text(Lang, Else),
-            send(Client, [{result, [{error, atom_to_binary(Else,latin1)}]}]),
+            Result = [{error, atom_to_binary(Else, latin1)}],
+            case Mod of
+                val_game -> send(Client, Result);
+                vre_user -> send(Client, [{result, Result}])
+            end,
             {error, Else, Auth}
     end.
 
@@ -191,10 +194,7 @@ closed(Client = #client{address=Addr, socket=S}, Reason) ->
     io:format("tcp socket: ~w ~w ~p.~n", [Addr, S, Reason]),
     close_client(Client).
 
-send_raw(#client{socket=S}, Data) ->
-    gen_tcp:send(S, Data).
-
-send(Client, Object) ->
-    send_raw(Client, [jsx:term_to_json(Object), $\n]).
-
-
+send(#client{socktype=zen_acceptor_tcp, socket=S}, Object) ->
+    gen_tcp:send(S, [jsx:term_to_json(Object), $\n]);
+send(#client{socktype=zen_acceptor_web, socket=S}, Object) ->
+    gen_tcp:send(S, [0, jsx:term_to_json(Object), 255]).

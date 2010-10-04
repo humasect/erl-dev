@@ -3,6 +3,9 @@
 #+SETUPFILE: setup.hrg
 #+INCLUDE: header.hrg
 
+* Project
+** TODO move htdocs/val to val/priv or something.
+
 * Erlang
 ** TODO zen_tcp:broadcaost to everyone, but zen_tcp:status_broadcast to status.
 ** TODO fix print IP address on socket closed.

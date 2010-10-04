@@ -23,13 +23,12 @@
 
 (defun lco-log (msg)
   (with-current-buffer (lco-message-buffer)
-  ;;(set-buffer (message-buffer))
-  ;;(buffer-end 1)
+    ;;(setq buffer-read-only f)
     (set-window-point (get-buffer-window (lco-message-buffer)) (point-max))
     (goto-char (point-max))
-    (insert msg)))
-  ;;(set-buffer (other-buffer)))
-
+    (insert msg)
+    ;;(setq buffer-read-only t)))
+    ))
 
 (defun lco-change-room (room)
   (lco-log (format "change room! %s" room))
@@ -91,7 +90,6 @@
 
   (select-frame f)
   (switch-to-buffer (lco-message-buffer))
-  (setq buffer-read-only t)
   ;;(delete-region (point-min) (point-max))
   (setq w2 (split-window (selected-window) 10))
   (select-window w2)

@@ -3,7 +3,7 @@
 #+SETUPFILE: ../setup.hrg
 
 * Humble Town
-  The hub town of the world which beginning players start and where veteran players respawn.
+  The hub town of the world which beginning players start and where existing players respawn.
 ** Layman's Dungeon
    - The place where a beginning player will start to learn the game
    - Existing players can return here to gain some levels on respawn.
@@ -29,6 +29,35 @@
 
 * Dungeons
   - Dungeons are like entering a portal to a parallel realm or dream world.
+
+* Ideas
+  - "An oubliette (from the French oubliette - literally "forgotten place") was
+    a form of dungeon which was accessible only from a hatch in a high ceiling.
+    The word comes from the same root as the French oublier, "to forget,"
+    as it was used for those prisoners the captors wished to forget."
+    [[http://en.wikipedia.org/wiki/Dungeon][Wikipedia]]
+  - Seattle Underground
+    [[http://en.wikipedia.org/wiki/Seattle_Underground][Wikipedia]]
+  - Portland Underground
+  - Labyrinth
+  - Doors which open to different areas with the same door.
+  - The cleaner(s): Cave Drill!
+  - Hedge Race
+  - Side View maps, of climbing and so on. Battletoads, Zelda GB.
+  - Jars are Warps?
+  - All indoor areas, with indoor forests.
+  - Many things should be person or character,
+    - Goblins control machines, (eg. Cave Drill and Door Knight),
+    - Objects with faces
+    - Eyes, Hands, Mouths.
+  - Lots of knights. Different colors -- And knights riding stuff.
+  - City of Miniature things!!!!!!!!
+  - Moving/alive rocks. And trees.
+  - Cannons
+  - Broken apart pieces of ground and architecture floating about,
+    like Alice area that goes through the door
+  - Owls.
+
 
 ** The Middle Areas
 

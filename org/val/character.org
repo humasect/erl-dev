@@ -8,7 +8,9 @@
   - Dharma(lawful)
 
 * Jobs
-  - Player can select a profession to specialise in weapons and skills and game outcome.
+  - Starting job is "wanderer" or "adventurer"
+  - Player can select a profession later in game,
+    to specialise in weapons and skills and game outcome.
 | Job       | Tag | Element | Equip Weapon | Item Weapon | Bonuses      |
 |-----------+-----+---------+--------------+-------------+--------------|
 | Ninja     | N   | Metal   | Sword        | Knife       | AGI+5 STR+10 |
