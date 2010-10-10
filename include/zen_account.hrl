@@ -21,10 +21,10 @@
           login :: string(),
           password :: string(),
           name :: string(),
-          language=english :: language(),
-          actor_id :: uinteger(),
-          create_time=erlang:localtime(),
-          last_time,
-          last_ip,
+          language = english :: language(),
+          games = [] :: [atom()],
+          create_time = erlang:localtime(),
+          last_time = never,
+          last_ip = {0,0,0,0},
           auth_count=0 :: uinteger()
         }).

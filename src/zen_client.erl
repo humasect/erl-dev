@@ -19,7 +19,7 @@
 
 -record(in_game,
         {id :: uinteger(),
-         module :: atom(),
+         game_name :: atom(),
          game_pid :: pid()}).
 
 -record(client,
@@ -77,7 +77,7 @@ process_data(Data, Client) ->
         [{<<"client">>, [{<<"login">>, [User, Pass]}]}] ->
             login({User, Pass, vre_user, english}, Client);
         [{<<"login">>, [User, Pass, Language]}] ->
-            login({User, Pass, val_game, Language}, Client);
+            login({User, Pass, 'Test', Language}, Client);
         Else ->
             handle_message(Else, Client)
         %%Else ->
@@ -126,28 +126,30 @@ close_client(Client) ->
 %%% authentication
 %%%===================================================================
 
-login({Login, Password, Mod, _Lang},
+login({Login, Password, GameName, _Lang},
       Client = #client{address=Addr, status=waiting_auth}) ->
     Auth = {binary_to_list(Login),
             binary_to_list(Password),
-            Addr, Mod},
+            Addr, GameName},
     case ?MODULE:authorize(Auth) of
-        {ok,Group,#account{id=Id,actor_id=ActorId,name=Name}} ->
+        {ok,Group,Account = #account{id=Id,name=Name}} ->
             io:format("log in: ~p~n", [Auth]),
-            Game = zen_session_sup:start_session(Id, Mod),
+            Game = zen_session_sup:start_session(Id, GameName),
             link(Game),
-            
+
+            %% move this requirement out into game code.
+            ActorId = proplists:get_value(GameName, Account#account.games),
             NewClient = Client#client{status = #in_game{id = Id,
-                                                        module = Mod,
+                                                        game_name = GameName,
                                                         game_pid = Game}},
             handle_message({logged_in, ActorId, Group, Name}, NewClient);
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
             %%Text = zen_data:get_text(Lang, Else),
             Result = [{error, atom_to_binary(Else, latin1)}],
-            case Mod of
-                val_game -> send(Client, Result);
-                vre_user -> send(Client, [{result, Result}])
+            case GameName of
+                vre_user -> send(Client, [{result, Result}]) ;
+                _ -> send(Client, Result)
             end,
             {error, Else, Auth}
     end.
@@ -178,7 +180,9 @@ authorize({Login, Password, Ip, _Mod}) ->
                                 Group = zen_web:user_group(Login),
                                 {ok, Group, Account}
                         end;
-                    _ -> bad_credentials
+                    X -> 
+                        io:format("aoeuaoeu '~p'~n", [X]),
+                        bad_credentials
                 end
         end,
     case mnesia:transaction(F) of

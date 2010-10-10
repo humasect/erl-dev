@@ -8,11 +8,25 @@
 
 * Erlang
 ** TODO zen_tcp:broadcaost to everyone, but zen_tcp:status_broadcast to status.
-** TODO fix print IP address on socket closed.
+** DONE fix print IP address on socket closed.
+   CLOSED: [2010-10-04 Mon 05:13]
 ** TODO logging!
-** TODO ping/pong timeout
+** TODO ping/pong timeout?
 ** TODO one table per game: vre_account   val_account
 
+** TODO host games over ports, not login message
+   each port is tcp or websocket
+** TODO restful version for iphone and old browser?
+** TODO each game is an appsup
+** TODO zen appsup
+** TODO more login messages for Val.
+** TODO make {val_account,AccountId} for http_user UserInfo.
+   and same with VRE.
+** TODO store turns and lots of data like crawl.
+
+* JavaScript
+** TODO black background
+** TODO translate login messages
 
 * Emacs
 ** DONE iswitchでタブコンプリート!

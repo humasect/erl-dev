@@ -27,22 +27,26 @@
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
-start_session(Id, Module) ->
-    Spec = {Id, {Module, start_link, [Id]},
-            temporary, 2000, worker, [Module]},
+start_session(Id, Name) ->
+    Spec = {Id, {zen_game, start_link, [Id, Name]},
+            temporary, 2000, worker, [zen_game]},
     case supervisor:start_child(?SERVER, Spec) of
         {ok,Child} -> Child;
         {ok,Child,_} -> Child;
         {error,already_present} ->
             stop_session(Id),
-            start_session(Id, Module);
+            start_session(Id, Name);
         {error,{already_started,Child}} -> Child;
         Else -> throw(Else)
     end.
 
 stop_session(Id) ->
     %% only called from zen_client:close_client
-    supervisor:terminate_child(?SERVER, Id),
+    %%supervisor:terminate_child(?SERVER, Id),
+    case which_session(Id) of
+        undefined -> ok;
+        Pid -> Pid ! stop
+    end,
     supervisor:delete_child(?SERVER, Id),
     {closed,Id}.
 

@@ -22,6 +22,12 @@
 create_actor(GameId, Dict) ->
     ok.
 
+destroy_actor(ActorId) ->
+    ok.
+
+list_actors() ->
+    mnesia:transaction(fun() -> mnesia:match_object(#val_actor{_='_'}) end).
+
 %%%===================================================================
 %%% Database
 %%%===================================================================

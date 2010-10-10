@@ -14,6 +14,7 @@
 -export([add_user/4, delete_user/1, user_group/1]).
 
 -include("zen_account.hrl").
+%%-include_lib("inets/src/http_server/mod_auth.hrl").
 -include("mod_auth.hrl").
 
 -define(AUTH_PASS, "valhalla").

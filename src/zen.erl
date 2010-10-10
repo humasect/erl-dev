@@ -13,7 +13,7 @@
 -export([start_all/0, stop_all/0,
          init_db/0, make_all_docs/0]).
 -export([create_account/4,
-         remove_account/1,
+         destroy_account/1,
          list_accounts/0]).
 
 -include("zen_account.hrl").
@@ -43,13 +43,7 @@ make_all_docs() ->
 %%% Accounts
 %%%===================================================================
 
--spec create_account(string(), string(), string(), user_group()) ->
-                            ok | {error, term()}.
-%%% @doc add account.
 create_account(Login, Password, Name, Group) ->
-    %%make_world_t(Id),
-    ActorId = 0, %make_actor_t(Id, {0,0}, {player, undef, undef, undef}),
-
     F = fun() ->
                 case mnesia:match_object(#account{login=Login, _='_'}) of
                     [] -> ok;
@@ -59,8 +53,7 @@ create_account(Login, Password, Name, Group) ->
                 Id = huma_db:next_id(account),
                 mnesia:write(#account{id=Id,
                                       login=Login, password=Password,
-                                      name=Name,
-                                      actor_id=ActorId
+                                      name=Name
                                      }),
                 Id
         end,
@@ -75,9 +68,10 @@ list_accounts() ->
     mnesia:transaction(
       fun() -> mnesia:match_object(#account{_='_'}) end).
 
-remove_account(Id) ->
+destroy_account(Id) ->
     %% @todo
-    %% kick user out of game.
+    %% - kick user out of game.
+    %% - remove account actor
     mnesia:transaction(fun() -> mnesia:delete({account,Id}) end),
     zen_web:delete_user(Id).
 
@@ -91,17 +85,17 @@ init_db() ->
     ?init_table(account, ordered_set,
                 fun
                     ({account, Id, Login, Password, Name, Language,
-                      ActorId,
-                      CreateTime, LastTime, LastIp}) ->
+                      _Games, _Nothing,
+                      CreateTime, LastTime, LastIp, AuthCount}) ->
                         #account{id=Id,
                                  login=Login, password=Password,
                                  name=Name,
                                  language=Language,
-                                 actor_id=ActorId,
+                                 games=[],
                                  create_time=CreateTime,
                                  last_time=LastTime,
                                  last_ip=LastIp,
-                                 auth_count=0}
+                                 auth_count=AuthCount}
                 end),
 
     %% ウーザを追加
