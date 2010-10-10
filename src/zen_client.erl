@@ -70,9 +70,9 @@ loop(Client = #client{socket=Socket}) ->
 %%%===================================================================
 
 process_data(Data, Client) ->
-    io:format("daaaaaaaata = '~s'~n", [Data]),
+    io:format("> data = '~s'~n", [Data]),
     Msg = jsx:json_to_term(Data),
-    io:format("message = ~p~n", [Msg]),
+    io:format("> message = ~p~n", [Msg]),
     case Msg of
         [{<<"client">>, [{<<"login">>, [User, Pass]}]}] ->
             login({User, Pass, vre_user, english}, Client);
@@ -80,9 +80,6 @@ process_data(Data, Client) ->
             login({User, Pass, 'Test', Language}, Client);
         Else ->
             handle_message(Else, Client)
-        %%Else ->
-        %%    send(Client, [{error, <<"unknown_message">>}]),
-        %%    {error, unknown_message, Else}
     end.
 
 handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
