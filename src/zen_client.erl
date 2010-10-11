@@ -69,18 +69,36 @@ loop(Client = #client{socket=Socket}) ->
 %%% messaging
 %%%===================================================================
 
-process_data(Data, Client) ->
+game_info('Test') -> ok.
+
+process_data(Data, Client = #client{status=#in_game{game_pid=Game}}) ->
+    case gen_server:call(Game, Data) of
+        ok ->
+            {ok, Client};
+        {send,Result} ->
+            send(Client, Result),
+            {ok, Client};
+        {error,Reason} ->
+            send(Client, [{error, atom_to_binary(Reason, latin1)}]),
+            closed(Client, {error, Reason, Data})
+    end ;
+process_data(Data, Client = #client{status=waiting_auth}) ->
     io:format("> data = '~s'~n", [Data]),
     Msg = jsx:json_to_term(Data),
     io:format("> message = ~p~n", [Msg]),
     case Msg of
         [{<<"client">>, [{<<"login">>, [User, Pass]}]}] ->
-            login({User, Pass, vre_user, english}, Client);
-        [{<<"login">>, [User, Pass, Language]}] ->
-            login({User, Pass, 'Test', Language}, Client);
+            login({User, Pass, 'VREnv', english}, Client);
+        [{<<"login">>, [User, Pass, GameName, Language]}] ->
+            login({User, Pass,
+                   binary_to_existing_atom(GameName, latin1),
+                   Language}, Client);
         Else ->
-            handle_message(Else, Client)
-    end.
+            {error, unknown_message, Else}
+            %%handle_message(Else, Client)
+    end .
+
+-ifdef(unused_vre_stuff). %%%%%%%%%%%%%%%%%%%%%%%
 
 handle_message([{<<"command">>, <<$/,Cmd/binary>>}], Client) ->
     %% @todo only if user is 'dev', evaluate erlang.
@@ -108,6 +126,8 @@ handle_message(Msg, Client = #client{status=#in_game{game_pid=Game}}) ->
         ;
 handle_message(Msg, _Client) ->
     {error, not_logged_in, Msg}.
+
+-endif. %%%%%%%%%%%%%%%%%%
 
 close_client(Client = #client{status=#in_game{id=Id, game_pid=Game}}) ->
     io:format("close game ~p~n", [Id]),
@@ -139,7 +159,8 @@ login({Login, Password, GameName, _Lang},
             NewClient = Client#client{status = #in_game{id = Id,
                                                         game_name = GameName,
                                                         game_pid = Game}},
-            handle_message({logged_in, ActorId, Group, Name}, NewClient);
+            gen_server:call(Game, {logged_in, ActorId, Group, Name}),
+            {ok, NewClient};
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
             %%Text = zen_data:get_text(Lang, Else),

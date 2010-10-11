@@ -44,7 +44,6 @@ init([Id, Name]) ->
     Port = open_port({spawn, filename:join(Path, Name)},
                      [%stream, {line,80},
                       binary, {packet,2},
-                      %binary,
                       {cd, Path}, eof]),
     io:format("port_info: ~p~n", [erlang:port_info(Port)]),
     {ok, #state{login_id=Id,
@@ -63,33 +62,46 @@ handle_call(Request, _From, State) ->
     %%port_command(State#state.port,
     %%             binary_to_list(jsx:term_to_json(Request))),
 
-    port_command(State#state.port, <<"aoeuaoeuaouao....r.ia~n">>),
-
+    port_command(State#state.port, <<"aoeuaoeuaouao....r.ia~n">>)
+        ,{reply, ok, State}
+        .
     %% receive
-    %%     {_Port, {data, Data}} ->
-    %%         io:format(".......... ~p~n", [Data]),
-    %%         {reply, Data, State};
-    %%     Any ->
-    %%         io:format("aoeuaoeuaoeuaoeu ~p~n", [Any])
+    %%     {_Port, {data, Data}} -> {reply, Data, State};
+    %%     Else -> {stop, port_error, Else}
     %% after
-    %%     5000 ->
-    %%         {stop, port_timeout, State}
-    %% end .
-    {reply, ok, State} .
+    %%     2000 -> {stop, port_timeout, State}
+    %% end.
 
 handle_cast(_Msg, State) ->
-    {noreply, State} .
+    {noreply, State}
+        .
 
-handle_info({_Port, {data, Data}}, State) ->
-    io:format("game data: '~p'~n", [Data]),
-    {noreply, State} ;
+handle_info({_Port, {o_data, <<$-,Data/binary>>}}, State)
+%% evaluate some erlang
+-> {ok,Scanned,_} = erl_scan:string(binary_to_list(Data))
+       ,{ok,Parsed} = erl_parse:parse_exprs(Scanned)
+       ,Eval = erl_eval:exprs(Parsed, [])
+       ,io:format("eval: ~p~n", [Eval])
+   %%Result = io_lib:format("~p", [Eval]),
+   %%send_object(St, {"message", list_to_binary(Result)})
+       ,{noreply, State}
+       ;
+
+handle_info({_Port, {data, Data}}, State)
+->io:format("game data: '~p'~n", [Data])
+  %%gen_server:reply(self(), Data),
+      ,{noreply, State}
+      ;
 handle_info(stop, State) ->
-    {stop, shutdown, State} ;
+    {stop, shutdown, State}
+        ;
 handle_info({'EXIT', _Port, Reason}, State) ->
-    {stop, {port_exited,Reason}, State} ;
+    {stop, {port_exited,Reason}, State}
+        ;
 handle_info(_Info, State) ->
     io:format("unknown info: '~p'~n", [_Info]),
-    {noreply, State} .
+    {noreply, State}
+        .
 
 terminate(_Reason, State) ->
     io:format("game terminated.~n"),
