@@ -1,4 +1,4 @@
-*.beam
+ebin/*.beam
 user_default.erl
 log/*
 htdocs/log/*
@@ -7,3 +7,6 @@ htdocs/dev/*
 
 oldsrc
 Mnesia.erl-dev@McHoovy
+
+vaskerl/Erlang.hs
+vaskerl/Erlang_hsc_make.c

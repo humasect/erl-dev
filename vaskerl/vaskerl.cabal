@@ -1,0 +1,11 @@
+Name:           vaskerl
+Version:        1.0
+Synopsis:       Erlang Node interface for Valhalla/Zen game server
+Description:    Erlang Node interface for Valhalla/Zen game server
+--License:
+Author:         Lyndon Tremblay
+Maintainer:     Lyndon Tremblay <humasect@gmail.com>
+Build-Depends:  base network
+
+Executable:     vaskell
+Main-is:        Vaskell.hs
