@@ -139,7 +139,9 @@
   (lco-init)
 
   (lco-init-net user pass)
-  (lco-send `(:login [,user ,pass "Test" "japanese"])))
+  ;(lco-send `(:login [,user ,pass "Test" "japanese"]))
+  (lco-send `(:client (:login [,user ,pass])))
+  )
 
 (defun lco-quit ()
   (interactive)

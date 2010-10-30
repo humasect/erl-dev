@@ -14,22 +14,25 @@ import Foreign.C
 #define CALLCONV ccall
 #endif
 
-data ErlTypes =
-       ErlUndef | ErlInteger | ErlUInteger | ErlAtom | ErlPid |
-     | ErlPort | ErlRef | ErlCons | ErlList | ErlNil | ErlEmptyList
-     | ErlTuple | ErlBinary | ErlFloat | ErlVariable | ErlSmallBig
-     | ErlUSmallBig | ErlFunction | ErlBig | ErlLongLong | ErlULongLong
+-- data ErlTypes =
+--        ErlUndef | ErlInteger | ErlUInteger | ErlAtom | ErlPid
+--      | ErlPort | ErlRef | ErlCons | ErlList | ErlNil | ErlEmptyList
+--      | ErlTuple | ErlBinary | ErlFloat | ErlVariable | ErlSmallBig
+--      | ErlUSmallBig | ErlFunction | ErlBig | ErlLongLong | ErlULongLong
 
 -- type ErlHeader = #{type Erl_Header}
+
+data ErlTerm =
+     ErlInteger {}
 
 data ErlMessage = ErlMessage
      { t :: Int,
        msg, from, to :: Ptr ErlTerm,
        to_name :: [Char] }
 
-instance Storable ErlMessage where
-  sizeOf _ = 4*sizeOf (Ptr a) + 
-  alignment _ = alignment (undefined :: Int)
+--instance Storable ErlMessage where
+--  sizeOf _ = 4*sizeOf (Ptr a) + 
+--  alignment _ = alignment (undefined :: Int)
 
 -- does not work.
 -- #define UNSAFE_CALL foreign import CALLCONV unsafe

@@ -44,7 +44,7 @@ handle_call({logged_in, ActorId, Group, Name}, _From, State) ->
                [{ok, [atom_to_binary(Group, latin1),
                       [{user, [ActorId,
                                list_to_binary(Name)]}]]}]}],
-    {reply, {send, Result}, State}
+    {reply, Result, State}
         ;
 handle_call([{<<"exit">>, _Reason}], _From, State) ->
     {stop, normal, ok, State}

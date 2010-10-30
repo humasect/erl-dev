@@ -28,8 +28,11 @@ start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
 start_session(Id, Name) ->
-    Spec = {Id, {zen_game, start_link, [Id, Name]},
-            temporary, 2000, worker, [zen_game]},
+    %% temp !
+    Spec = {Id, {Name, start_link, [Id]},
+            temporary, 2000, worker, [Name]},
+    %%Spec = {Id, {zen_game, start_link, [Id, Name]},
+    %%        temporary, 2000, worker, [zen_game]},
     case supervisor:start_child(?SERVER, Spec) of
         {ok,Child} -> Child;
         {ok,Child,_} -> Child;

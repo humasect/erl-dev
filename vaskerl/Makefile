@@ -1,4 +1,4 @@
-TARGET = vaskerl
+TARGET = Vaskerl
 
 SOURCES = node.c Erlang.hs Vaskerl.hs
 #OBJECTS = v_port.o Vaskerl.o

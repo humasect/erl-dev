@@ -88,7 +88,7 @@ process_data(Data, Client = #client{status=waiting_auth}) ->
     io:format("> message = ~p~n", [Msg]),
     case Msg of
         [{<<"client">>, [{<<"login">>, [User, Pass]}]}] ->
-            login({User, Pass, 'VREnv', english}, Client);
+            login({User, Pass, vre_user, english}, Client);
         [{<<"login">>, [User, Pass, GameName, Language]}] ->
             login({User, Pass,
                    binary_to_existing_atom(GameName, latin1),
@@ -159,7 +159,9 @@ login({Login, Password, GameName, _Lang},
             NewClient = Client#client{status = #in_game{id = Id,
                                                         game_name = GameName,
                                                         game_pid = Game}},
-            gen_server:call(Game, {logged_in, ActorId, Group, Name}),
+            Result = gen_server:call(Game, {logged_in, ActorId, Group, Name}),
+            io:format("oaeu ~p~n", [Result]),
+            send(Client, Result),
             {ok, NewClient};
         Else ->
             %%Lang = binary_to_existing_atom(Language,latin1),
