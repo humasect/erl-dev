@@ -19,7 +19,8 @@
 
 -define(SERVER, ?MODULE). 
 
--record(user, {login_id}).
+-record(user, {login_id,
+              pos={0,0}}).
 
 %%%===================================================================
 %%% API
@@ -35,6 +36,9 @@ start_link(Id) ->
 init([Id]) ->
     {ok, #user{login_id = Id}}.
 
+handle_call([{<<"client">>, [{<<"walk_to">>, [X, Y]}]}], _From, State) ->
+    {reply, {send, [{reply, "ok"}]}, State#user{pos = {X,Y}}}
+    ;
 handle_call([{<<"client">>, <<"get_time">>}], _From, State) ->
     {_Mega,Sec,_Micro} = now(),
     {reply, {send, [{result, [{ok, Sec}]}]}, State}
